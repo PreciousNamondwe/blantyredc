@@ -1,0 +1,15 @@
+﻿from pathlib import Path
+
+path = Path(r'e:\xampp\htdocs\Blantyre-District-council-web-App\app\Views\admin\dashboard.php')
+text = path.read_text(encoding='utf-8')
+needle = "\t\t\t\t\t\t<?php else: ?>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<td colspan=\"4\" class=\"text-center text-muted\">No recent applications</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t<?php endif; ?>\n\t\t\t\t\t</tbody>\n\t\t\t\t</table>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\n\t\t</div>\n"
+if needle not in text:
+    print('needle_not_found')
+    raise SystemExit(1)
+insert = needle.replace('\t\t\t\t\t</div>\n\n\t\t</div>\n', '\t\t\t\t\t</div>\n\t\t</div>\n\n\t\t<div class="row">\n\t\t\t<div class="col-xl-6">\n\t\t\t\t<div class="card mb-4">\n\t\t\t\t\t<div class="card-body">\n\t\t\t\t\t\t<h5 class="card-title">Notices Overview</h5>\n\t\t\t\t\t\t<div class="row text-center">\n\t\t\t\t\t\t\t<div class="col-4 border-end">\n\t\t\t\t\t\t\t\t<p class="text-muted small mb-1">Published</p>\n\t\t\t\t\t\t\t\t<h5 class="mb-0"><?= number_format($stats[\'published_notices\'] ?? 0) ?></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class="col-4 border-end">\n\t\t\t\t\t\t\t\t<p class="text-muted small mb-1">Draft</p>\n\t\t\t\t\t\t\t\t<h5 class="mb-0"><?= number_format($stats[\'draft_notices\'] ?? 0) ?></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class="col-4">\n\t\t\t\t\t\t\t\t<p class="text-muted small mb-1">Archived</p>\n\t\t\t\t\t\t\t\t<h5 class="mb-0"><?= number_format($stats[\'archived_notices\'] ?? 0) ?></h5>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class="col-xl-6">\n\t\t\t\t<div class="card mb-4">\n\t\t\t\t\t<div class="card-body">\n\t\t\t\t\t\t<h5 class="card-title">Recent Notices</h5>\n\t\t\t\t\t\t<div class="list-group list-group-flush">\n\t\t\t\t\t\t\t<?php if (!empty($recent_notices)): ?>\n\t\t\t\t\t\t\t\t<?php foreach ($recent_notices as $notice): ?>\n\t\t\t\t\t\t\t\t\t<a href="<?= base_url(\'admin/notices/\' . ($notice[\'id\'] ?? \'')) ?>" class="list-group-item list-group-item-action">\n\t\t\t\t\t\t\t\t\t\t<div class="d-flex justify-content-between align-items-center">\n\t\t\t\t\t\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t\t\t\t\t\t<strong><?= esc(substr($notice[\'title\'], 0, 60)) ?></strong>\n\t\t\t\t\t\t\t\t\t\t\t\t<div class="text-muted small"><?= esc($notice['category']) ?> · <?= date('M d, Y', strtotime($notice['published_at'] ?? $notice['created_at'] ?? 'now')) ?></div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<span class="badge bg-success"><?= esc(ucfirst($notice['urgency_level'] ?? '')) ?></span>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t<?php endforeach; ?>\n\t\t\t\t\t\t\t<?php else: ?>\n\t\t\t\t\t\t\t\t<div class="list-group-item text-center text-muted">No published notices found</div>\n\t\t\t\t\t\t\t<?php endif; ?>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t</div>\n')
+text_new = text.replace(needle, insert)
+if text_new == text:
+    print('no-op')
+else:
+    path.write_text(text_new, encoding='utf-8')
+    print('inserted')

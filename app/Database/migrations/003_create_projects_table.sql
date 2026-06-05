@@ -1,0 +1,28 @@
+-- Projects Table
+CREATE TABLE IF NOT EXISTS `projects` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `location` VARCHAR(255) NOT NULL,
+    `category` VARCHAR(100) NOT NULL,
+    `status` ENUM('planning', 'ongoing', 'completed', 'suspended', 'cancelled') NOT NULL DEFAULT 'planning',
+    `progress_percentage` INT DEFAULT 0 CHECK(progress_percentage >= 0 AND progress_percentage <= 100),
+    `start_date` DATE NOT NULL,
+    `estimated_completion_date` DATE NOT NULL,
+    `actual_completion_date` DATE NULL,
+    `budget` DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    `spent_amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    `contractor` VARCHAR(255) NULL,
+    `image_url` VARCHAR(500) NULL,
+    `details` LONGTEXT NULL,
+    `fund_source` VARCHAR(100) NULL,
+    `created_by` INT UNSIGNED NULL,
+    `is_active` BOOLEAN DEFAULT TRUE,
+    `created_at` DATETIME NULL,
+    `updated_at` DATETIME NULL,
+    INDEX idx_status (`status`),
+    INDEX idx_category (`category`),
+    INDEX idx_location (`location`),
+    INDEX idx_is_active (`is_active`),
+    FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
