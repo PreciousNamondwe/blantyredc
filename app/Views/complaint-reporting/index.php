@@ -2,25 +2,22 @@
 
 <?= $this->section('content')?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<!-- Main Wrapper Section (Matches Custom Soft Bluish-Slate Civic Layout) -->
 <section class="w-100 py-5" style="background-color: #f0f4f8;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 
-                <!-- Pure White Form Layout Container Card -->
                 <div class="card bg-white text-dark border-0 shadow-sm p-4 p-md-5 rounded-3">
                     
                     <form id="complaintReportingForm" method="POST" novalidate>
                         
-                        <!-- Section 1: Core Details -->
                         <div class="border-bottom pb-2 mb-4">
                             <h3 class="h4 text-dark fw-bold m-0">Complaint Details</h3>
                         </div>
                         
                         <div class="form-group mb-4">
                             <label class="form-label text-dark fw-semibold small text-uppercase mb-2">Complaint Category <span class="text-danger">*</span></label>
-                            <select name="complaint_category" class="form-select border-light-dark p-3 bg-light" data-custom-dropdown required>
+                            <select name="complaint_category" id="complaint_category" class="form-select border-light-dark p-3 bg-light" data-custom-dropdown required>
                                 <option value="">Select category</option>
                                 <option value="corruption">Corruption</option>
                                 <option value="roads">Roads & Infrastructure</option>
@@ -53,16 +50,15 @@
 
                         <div class="form-group mb-4">
                             <label class="form-label text-dark fw-semibold small text-uppercase mb-2">Priority Level <span class="text-danger">*</span></label>
-                            <select name="priority_level" class="form-select border-light-dark p-3 bg-light" data-custom-dropdown required>
+                            <select name="priority_level" id="priority_level" class="form-select border-light-dark p-3 bg-light" data-custom-dropdown required>
                                 <option value="">Select priority</option>
                                 <option value="low">Low - Can wait for regular schedule</option>
-                                <option value="medium">Medium - Needs attention soon</option>
+                                <option value="medium" selected>Medium - Needs attention soon</option>
                                 <option value="high">High - Urgent issue</option>
                                 <option value="emergency">Emergency - Immediate danger</option>
                             </select>
                         </div>
 
-                        <!-- Section 2: Supporting Evidence -->
                         <div class="border-bottom pb-2 mt-5 mb-4">
                             <h3 class="h4 text-dark fw-bold m-0">Supporting Evidence <span class="text-muted fs-6 fw-normal">(Optional)</span></h3>
                         </div>
@@ -74,11 +70,10 @@
                                 <div class="fw-bold text-dark mb-1">Click to upload photos or drag and drop</div>
                                 <div class="text-muted small">JPG or PNG (Max 5MB each, up to 5 photos)</div>
                             </div>
-                            <input type="file" id="fileInput1" name="photos" accept=".jpg,.jpeg,.png" multiple style="display: none;">
+                            <input type="file" id="fileInput1" name="photos[]" accept=".jpg,.jpeg,.png" multiple style="display: none;">
                             <div class="uploaded-files-list mt-3 row g-2" id="fileList1"></div>
                         </div>
 
-                        <!-- Section 3: Identity & Contact -->
                         <div class="border-bottom pb-2 mt-5 mb-4">
                             <h3 class="h4 text-dark fw-bold m-0">Contact Information</h3>
                         </div>
@@ -110,7 +105,6 @@
                             </label>
                         </div>
 
-                        <!-- Form Action Submission Row -->
                         <div class="d-flex justify-content-end align-items-center mt-5 pt-3 border-top" id="formActions">
                             <button type="submit" class="btn text-white px-5 py-3 fw-bold rounded-3 shadow-sm transition-all" id="submitBtn" style="background-color: #0a2540; border: none;">
                                 <i class="fas fa-paper-plane me-2"></i> Submit Complaint
@@ -118,7 +112,6 @@
                         </div>
                     </form>
 
-                    <!-- Success Message Layout Module (Hidden Initially) -->
                     <div id="successMessage" style="display: none;">
                         <div class="text-center py-4">
                             <i class="fas fa-check-circle text-success mb-3" style="font-size: 4.5rem;"></i>
@@ -199,22 +192,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const formData = new FormData(form);
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
             
             const payload = {
-                service_type: 'complaint_reporting',
+                complaint_category: formData.get('complaint_category'),
+                complaint_subject: formData.get('complaint_subject'),
+                complaint_description: formData.get('complaint_description'),
+                complaint_location: formData.get('complaint_location'),
+                priority_level: formData.get('priority_level') || 'medium',
+                anonymous: formData.get('anonymous') || '0',
                 applicant_name: formData.get('applicant_name'),
-                applicant_email: formData.get('applicant_email'),
                 applicant_phone: formData.get('applicant_phone'),
-                applicant_id_number: '',
-                payment_amount: 0,
-                form_data: JSON.stringify(jsonData)
+                applicant_email: formData.get('applicant_email')
             };
 
-            const response = await fetch('<?= base_url('api/applications/submit'); ?>', {
+            // TARGET UPDATED ENDPOINT TO TRIGGER THE Direct `complaint_reports` TABLE WRITE
+            const response = await fetch('<?= base_url('applications/complaint'); ?>', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -224,33 +216,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const result = await response.json();
 
-            if (result.success) {
-                const applicationId = result.data.application_id;
+            if (result.status === 'success' || result.success) {
+                const complaintId = result.data.id;
                 const files = fileHandler.getFiles();
                 
-                for (const file of files) {
+                // If files are attached, forward them linked explicitly to the logged complaint context path
+                if (files && files.length > 0) {
                     const photoFormData = new FormData();
-                    photoFormData.append('document', file);
-                    photoFormData.append('document_type', 'complaint_photo');
+                    for (const file of files) {
+                        photoFormData.append('attachments[]', file);
+                    }
 
-                    await fetch(`<?= base_url('api/applications/'); ?>${applicationId}/documents`, {
+                    await fetch(`<?= base_url('applications/'); ?>${complaintId}/documents`, {
                         method: 'POST',
                         body: photoFormData
                     });
                 }
 
-                document.getElementById('referenceNumber').textContent = result.data.reference_number;
+                document.getElementById('referenceNumber').textContent = result.reference;
                 form.style.display = 'none';
                 document.getElementById('formActions').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                alert('Error: ' + result.message);
+                alert('Error processing: ' + (result.message || 'Submission parameter failure.'));
                 resetSubmitBtn();
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            alert('An error occurred during submission.');
             resetSubmitBtn();
         }
     });
@@ -261,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Dropdown Custom Transformation Driver
+// Dropdown Custom UI Transformation Script
 (function() {
     function convertSelectToCustom(select) {
         if (select.dataset.converted === 'true') return;
@@ -332,5 +326,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 })();
 </script>
-
 <?= $this->endSection()?>

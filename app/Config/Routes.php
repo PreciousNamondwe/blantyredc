@@ -93,9 +93,17 @@ $routes->add('email/compose', 'Email::compose');
 $routes->post('email/send-email', 'Email::send_email');
 $routes->add('contact-us','ContactUs::index');
 $routes->add('contact-us/send-email','ContactUs::send_email');
-
+// Ensure this specific path maps directly to your controller method
+$routes->post('applications/complaint', 'ApplicationController::createComplaint');
+// Also provide the multipart image handling hook matching your JavaScript request loop
+$routes->post('applications/(:num)/documents', 'ApplicationController::saveUploadedFile/$1');
+$routes->get('applications/complaints', 'ApplicationController::getComplaints');
+$routes->get('applications/status/(:num)', 'ApplicationController::status/$1');
+// Web Workspace View Route
+$routes->get('applications/show/(:num)', 'ApplicationController::showWeb/$1');
 // API Routes for Digital Forms
 $routes->group('api', function($routes) {
+    $routes->get('complaints/fetch', 'ApplicationController::getComplaints');
     $routes->post('applications/submit', 'ApplicationController::submit');
     $routes->get('applications/(:num)/status', 'ApplicationController::status/$1');
     $routes->post('applications/(:num)/documents', 'ApplicationController::uploadDocument/$1');
@@ -207,12 +215,9 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->get('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/delete', 'AdminController::deleteOfficial/$1');
-    $routes->get('management', 'AdminController::management');
-    $routes->get('management/create', 'AdminController::createManagementMember');
-    $routes->post('management/create', 'AdminController::createManagementMember');
-    $routes->get('management/(:num)/edit', 'AdminController::editManagementMember/$1');
-    $routes->post('management/(:num)/edit', 'AdminController::editManagementMember/$1');
-    $routes->post('management/(:num)/delete', 'AdminController::deleteManagementMember/$1');
+    $routes->post('management/create', 'AdminController::createManagement');
+    $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
+    $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');
    
     $routes->get('payments', 'AdminController::payments');
     $routes->get('notifications', 'AdminController::notifications');
@@ -245,6 +250,7 @@ $routes->get('tenders', 'NoticesController::index');
 $routes->get('tenders/(:any)', 'NoticesController::detail/$1');
 $routes->get('notices', 'NoticesController::index');
 $routes->get('notices/(:any)', 'NoticesController::detail/$1');
+
 
 /*
  * --------------------------------------------------------------------
