@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.edit-official-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
-            editOfficialForm.setAttribute('action', `<?= base_url('admin/officials/update') ?>/${id}`);
+            editOfficialForm.setAttribute('action', `<?= base_url('admin/officials') ?>/${id}/edit`);
 
             document.getElementById('editOfficialName').value = this.getAttribute('data-name');
             document.getElementById('editOfficialPosition').value = this.getAttribute('data-position');
@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.edit-management-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
-            editManagementForm.setAttribute('action', `<?= base_url('admin/management/update') ?>/${id}`);
+            editManagementForm.setAttribute('action', `<?= base_url('admin/management') ?>/${id}/edit`);
 
             document.getElementById('editMgmtName').value = this.getAttribute('data-name');
             document.getElementById('editMgmtPosition').value = this.getAttribute('data-position');

@@ -159,35 +159,64 @@ class AdminController extends Controller
         return view('admin/layout/admin_master', $data);
     }
 
-    /**
-     * 4. PUBLIC MUNICIPAL SERVICES CATALOG
+   /**
+     * MAIN INDEX CATALOG LISTING
      */
     public function services()
     {
         $data = [
             'page_title' => 'Municipal Services Registry',
             'page'       => 'services', 
-            'services'   => $this->serviceModel->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
-
-    public function createService()
-    {
-        if ($this->request->is('post')) {
-            $this->serviceModel->save($this->request->getPost());
-            return redirect()->to('admin/services')->with('success', 'Service option mapped into public index catalog.');
-        }
-
-        $data = [
-            'page_title' => 'Register Public Service Pathway',
-            'page'       => 'services_create' 
+            'services'   => $this->serviceModel->orderBy('sort_order', 'ASC')->findAll()
         ];
         return view('admin/layout/admin_master', $data);
     }
 
     /**
+     * ACCEPTS NEW SUBMISSIONS FROM ENTRY MODAL
+     */
+    public function createService()
+    {
+        if ($this->request->is('post')) {
+            $formData = $this->request->getPost();
+            $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
+
+            if ($this->serviceModel->save($formData)) {
+                return redirect()->to('admin/services')->with('success', 'Service pathway saved to database registry.');
+            } else {
+                return redirect()->to('admin/services')->withInput()->with('error', implode('<br>', $this->serviceModel->errors()));
+            }
+        }
+        return redirect()->to('admin/services');
+    }
+
+    /**
+     * UNIFIED MODAL UPDATE TARGET ACTION
+     */
+    public function editService($id = null)
+    {
+        $service = $this->serviceModel->find($id);
+        if (!$service) {
+            return redirect()->to('admin/services')->with('error', 'The target service registry key cannot be loaded.');
+        }
+
+        if ($this->request->is('post')) {
+            $formData = $this->request->getPost();
+            $formData['id'] = $id; // Force update constraint match
+            $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
+
+            if ($this->serviceModel->save($formData)) {
+                return redirect()->to('admin/services')->with('success', 'Changes updated cleanly onto current dashboard record.');
+            } else {
+                return redirect()->to('admin/services')->withInput()->with('error', implode('<br>', $this->serviceModel->errors()));
+            }
+        }
+        return redirect()->to('admin/services');
+    }
+
+/**
      * 5. CIVIL DEVELOPMENT INITIATIVES (PROJECTS)
+     * LIST REGISTRY INDEX DISPLAY
      */
     public function projects()
     {
@@ -199,41 +228,58 @@ class AdminController extends Controller
         return view('admin/layout/admin_master', $data);
     }
 
+    /**
+     * PROCESS CREATION PATHWAY FROM MODAL ENGINES
+     */
     public function createProject()
     {
         if ($this->request->is('post')) {
-            $this->projectModel->save($this->request->getPost());
-            return redirect()->to('admin/projects')->with('success', 'Development baseline project initialized.');
-        }
+            $formData = $this->request->getPost();
+            $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
 
-        $data = [
-            'page_title' => 'Publish Corporate Development Initiative',
-            'page'       => 'projects_create' 
-        ];
-        return view('admin/layout/admin_master', $data);
+            if ($this->projectModel->save($formData)) {
+                return redirect()->to('admin/projects')->with('success', 'Development baseline project initialized.');
+            } else {
+                return redirect()->to('admin/projects')->withInput()->with('error', 'Failed to initialize project entry parameters.');
+            }
+        }
+        return redirect()->to('admin/projects');
     }
 
+    /**
+     * UNIFIED MODAL ACTION HOOK TARGET FOR RECORD MODIFICATION
+     */
     public function editProject($id)
     {
-        if ($this->request->is('post')) {
-            $this->projectModel->update($id, $this->request->getPost());
-            return redirect()->to('admin/projects')->with('success', 'Project specifications recalibrated.');
+        $project = $this->projectModel->find($id);
+        if (!$project) {
+            return redirect()->to('admin/projects')->with('error', 'Target system project node trace unavailable.');
         }
 
-        $data = [
-            'page_title' => 'Modify Development Profile',
-            'page'       => 'projects_edit', 
-            'project'    => $this->projectModel->find($id)
-        ];
-        return view('admin/layout/admin_master', $data);
+        if ($this->request->is('post')) {
+            $formData = $this->request->getPost();
+            $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
+
+            if ($this->projectModel->update($id, $formData)) {
+                return redirect()->to('admin/projects')->with('success', 'Project specifications recalibrated.');
+            } else {
+                return redirect()->to('admin/projects')->withInput()->with('error', 'Failed to save updated system tracking metrics.');
+            }
+        }
+        return redirect()->to('admin/projects');
     }
 
+    /**
+     * PURGE SYSTEM PROJECT SPECIFICATION RECORDS
+     */
     public function deleteProject($id)
     {
-        $this->projectModel->delete($id);
-        return redirect()->to('admin/projects')->with('success', 'Project execution node scrubbed.');
+        if ($this->projectModel->find($id)) {
+            $this->projectModel->delete($id);
+            return redirect()->to('admin/projects')->with('success', 'Project execution node scrubbed.');
+        }
+        return redirect()->to('admin/projects')->with('error', 'Unable to trace target operational project element.');
     }
-
     /**
      * 6. ELECTED OFFICIALS & MANAGEMENT STRUCTURES
      */
