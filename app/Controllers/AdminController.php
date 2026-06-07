@@ -680,6 +680,21 @@ public function deleteManagement($id = null)
         return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'System database engine rejected deletion execution workflows.');
     }
 }
+
+/**
+     * 7. NEWS & PRESS RELEASES
+     * MAIN INDEX LISTING OF ALL NEWS ENTRIES
+     */
+
+   public function news()
+    {
+        $data = [
+            'page_title' => 'Press Release Ledger',
+            'page'       => 'news', 
+            'news'       => $this->newsModel->orderBy('created_at', 'DESC')->findAll()
+        ];
+        return view('admin/layout/admin_master', $data);
+    }
     /**
      * Create/Insert a new News Entry
      */
