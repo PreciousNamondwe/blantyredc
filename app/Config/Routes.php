@@ -214,10 +214,15 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->get('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/delete', 'AdminController::deleteOfficial/$1');
+    $routes->post('officials/update/(:num)', 'AdminController::updateOfficial/$1');
+    $routes->post('officials/delete/(:num)', 'AdminController::deleteOfficial/$1');
+    $routes->post('officials/store', 'AdminController::storeOfficial');
     
+    $routes->get('management', 'AdminController::management');
     $routes->post('management/create', 'AdminController::createManagement');
-    $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
-    $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');
+    $routes->post('management/update/(:num)', 'AdminController::updateManagement/$1'); // Fixed: Matches your Edit JS modal target
+    $routes->post('management/delete/(:num)', 'AdminController::deleteManagement/$1'); // Fixed: Matches your HTML Delete form target
+
    
     $routes->get('news', 'AdminController::news');
     $routes->post('news/create', 'AdminController::createNews');
