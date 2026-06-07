@@ -221,7 +221,8 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     
     $routes->post('management/create', 'AdminController::createManagement');
     $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
-    $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');
+    // Place this inside your admin group container matching your management forms layout:
+    $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');;
    
     $routes->get('news', 'AdminController::news');
     $routes->post('news/create', 'AdminController::createNews');
