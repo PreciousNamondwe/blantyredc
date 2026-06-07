@@ -91,7 +91,7 @@
                                         <button type="button" class="btn btn-sm btn-light border bg-white text-dark px-2 py-1 btn-action" data-bs-toggle="modal" data-bs-target="#editNoticeModal<?= $item['id'] ?>">
                                             <i class="fas fa-edit text-primary me-1"></i>Edit
                                         </button>
-                                        <form action="<?= base_url('admin/notices/delete/' . $item['id']) ?>" method="POST" class="d-inline m-0" onsubmit="return confirm('Securely delete this announcement notice from records?');">
+                                        <form action="<?= base_url('admin/notices/' . $item['id'] . '/delete') ?>" method="POST" class="d-inline m-0" onsubmit="return confirm('Securely delete this announcement notice from records?');">
                                             <?= csrf_field() ?>
                                             <button type="submit" class="btn btn-sm btn-light border bg-white text-danger px-2 py-1 btn-action">
                                                 <i class="fas fa-trash-alt me-1"></i>Purge

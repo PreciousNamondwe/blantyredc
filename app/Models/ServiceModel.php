@@ -31,12 +31,13 @@ class ServiceModel extends Model
 
     // Validation
     protected $validationRules = [
+        // FIXED: Using the standard CodeIgniter 4 dynamic ignore placeholder
         'service_key' => 'required|max_length[100]|is_unique[services.service_key,id,{id}]',
         'service_name' => 'required|max_length[255]',
         'department' => 'required|max_length[100]',
         'fee_amount' => 'required|decimal',
         'processing_days' => 'required|integer|greater_than[0]',
-        'sort_order' => 'integer'
+        'sort_order' => 'permit_empty|integer' // Softened constraint to allow updates if missing
     ];
 
     /**
