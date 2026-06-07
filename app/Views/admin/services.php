@@ -1,51 +1,252 @@
 <style>
-    .filter-toolbar {
-        background: #fff;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    /* ----------------------------------------------------
+       MALAWI GOVERNMENT BRANDING & EXCEL INTERFACE TOKENS
+       ---------------------------------------------------- */
+    :root {
+        --gov-navy-primary: #1a3352;
+        --gov-navy-hover: #112237;
+        --gov-gold: #d4af37;
+        --gov-gold-light: #fdfaf2;
+        --gov-border: #ccd4dc;
+        --gov-text: #2d3748;
+        
+        /* Strict Excel Grid Architecture Settings */
+        --excel-border: #d0d7de;
+        --excel-header-bg: #f6f8fa;
     }
-    .search-input-group {
+
+    /* Primary Heading Block */
+    .registry-header-block {
+        background: var(--gov-navy-primary);
+        border: 1px solid var(--excel-border);
+        border-bottom: 3px solid var(--gov-navy-hover);
+        padding: 16px 20px;
+        margin-bottom: -1px; /* Blends cleanly down into the grid filters */
+        border-radius: 0px !important;
+    }
+
+    /* Action Grid Controls */
+    .registry-action-bar {
+        background: var(--gov-navy-hover);
+        border: 1px solid var(--gov-gold);
+        padding: 12px 16px;
+        border-radius: 0px !important;
+        margin-bottom: 24px;
+    }
+
+    /* Sharp Form Field Token Modifications */
+    .registry-action-bar .form-control,
+    .registry-action-bar .form-select {
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 0px !important;
+        font-size: 0.85rem !important;
+        color: var(--gov-text) !important;
+        height: 36px;
+        background-color: #ffffff;
+    }
+
+    .registry-action-bar .form-control:focus,
+    .registry-action-bar .form-select:focus,
+    .modal-edit-mode .form-control:focus {
+        border-color: var(--gov-navy-primary) !important;
+        box-shadow: inset 0 0 0 1px var(--gov-gold) !important;
+        outline: none;
+    }
+
+    /* Embedded Form Search Layout */
+    .registry-search-box {
         position: relative;
     }
-    .search-input-group i {
+    
+    .registry-search-box i {
         position: absolute;
         left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: #748296;
+        font-size: 0.9rem;
     }
-    .search-input-group input {
-        padding-left: 35px;
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
+
+    .registry-search-box input {
+        padding-left: 34px !important;
     }
-    .search-input-group input:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    /* Government Action Buttons */
+    .btn-gov-primary {
+        background-color: var(--gov-navy-hover) !important;
+        border: 1px solid var(--gov-navy-primary) !important;
+        color: #ffffff !important;
+        border-radius: 0px !important; /* Strict sharp corporate edge */
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        height: 36px;
+        padding: 0 16px;
+        display: inline-flex;
+        align-items: center;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        transition: all 0.15s ease-in-out;
     }
-    .status-select {
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
-        color: #475569;
+
+    .btn-gov-primary:hover {
+        background-color: var(--gov-navy-hover) !important;
+        border-color: var(--gov-navy-hover) !important;
     }
-    .status-select:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    .btn-gov-primary i {
+        color: var(--gov-gold) !important; /* Gold plus icon badge accent */
     }
+
+    /* Excel Cell Readout */
+    .registry-cell-counter {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 0.75rem !important;
+        font-weight: 700;
+        color: #444d56;
+        background: #ffffff;
+        border: 1px solid var(--excel-border);
+        padding: 6px 12px;
+        display: inline-block;
+        letter-spacing: 0.5px;
+    }
+
+    /* Administrative Asset Box */
     .service-icon-box { 
-        width: 44px; 
-        height: 44px; 
+        width: 38px !important; 
+        height: 38px !important; 
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: rgba(56, 189, 248, 0.1);
-        color: #0284c7;
-        font-weight: 600;
-        border-radius: 0.5rem; 
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        background-color: var(--excel-header-bg) !important;
+        color: var(--gov-navy-primary) !important;
+        font-weight: 700 !important;
+        border-radius: 0px !important; 
+        border: 1px solid var(--excel-border) !important;
     }
-    /* Toggle states for unified viewer */
-    .modal-view-mode .form-control-plaintext { font-weight: 500; color: #1e293b; }
+
+    /* Core Bootstrap Component Overrides to enforce Identity System */
+    .btn-primary {
+        background-color: var(--gov-navy-primary) !important;
+        border-color: var(--gov-navy-primary) !important;
+        color: #ffffff !important;
+        border-radius: 0px !important;
+        font-weight: 500 !important;
+    }
+    .btn-primary:hover {
+        background-color: var(--gov-navy-hover) !important;
+        border-color: var(--gov-navy-hover) !important;
+    }
+    .btn-outline-primary {
+        border-color: var(--gov-navy-primary) !important;
+        color: var(--gov-navy-primary) !important;
+        border-radius: 0px !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--gov-navy-primary) !important;
+        color: #ffffff !important;
+    }
+    .btn-outline-secondary {
+        border-color: var(--excel-border) !important;
+        color: var(--gov-text) !important;
+        border-radius: 0px !important;
+    }
+    .btn-outline-secondary:hover {
+        background-color: var(--excel-header-bg) !important;
+    }
+    .btn-outline-danger {
+        border-radius: 0px !important;
+    }
+    .btn-success {
+        background-color: #2e7d32 !important;
+        border-color: #2e7d32 !important;
+        border-radius: 0px !important;
+    }
+
+    /* Strict Sheet Grid Strategy */
+    .dashboard-card {
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 0px !important;
+        box-shadow: none !important;
+    }
+    .table {
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+    }
+    .table th {
+        background-color: var(--excel-header-bg) !important;
+        color: #24292f !important;
+        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase;
+        border: 1px solid var(--excel-border) !important;
+        padding: 8px 12px !important;
+    }
+    .table td {
+        border: 1px solid var(--excel-border) !important;
+        padding: 8px 12px !important; 
+        font-size: 0.85rem !important;
+        color: var(--gov-text) !important;
+        background-color: #ffffff;
+    }
+    .table tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+    /* Form Overrides inside Modals */
+    .modal-content {
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 0px !important;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+    }
+    .modal-header {
+        background: linear-gradient(135deg, var(--gov-navy-primary) 0%, #2c4d75 100%) !important;
+        border-bottom: 4px solid var(--gov-gold) !important;
+        border-radius: 0px !important;
+    }
+    .modal-header .modal-title {
+        color: #ffffff !important;
+    }
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .modal-header .form-check-label {
+        color: #ffffff !important;
+    }
+    
+    .modal-edit-mode .form-control {
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 0px !important;
+        font-size: 0.85rem !important;
+    }
+    .modal-edit-mode .input-group-text {
+        background-color: var(--excel-header-bg) !important;
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 0px !important;
+        font-size: 0.85rem;
+    }
+    .modal-footer {
+        border-radius: 0px !important;
+    }
+
+    /* Fixed System Toast Configurations */
+    .auto-dismiss-alert {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        z-index: 1060;
+        min-width: 350px;
+        border-radius: 0px !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        border: none !important;
+        border-left: 4px solid transparent !important;
+        transition: all 0.4s ease-in-out;
+        opacity: 1;
+    }
+    .auto-dismiss-alert.alert-success { border-left-color: #2f855a !important; background-color: #f0fff4 !important; color: #22543d !important; }
+    .auto-dismiss-alert.alert-danger { border-left-color: #c53030 !important; background-color: #fff5f5 !important; color: #742a2a !important; }
+
+    /* Structural View/Edit toggles */
+    .modal-view-mode .form-control-plaintext { font-weight: 600; color: var(--gov-text); padding-left: 4px; }
     .modal-view-mode .editable-field { display: none !important; }
     .modal-view-mode .view-only-badge { display: inline-block; }
     .modal-view-mode .modal-footer-edit { display: none !important; }
@@ -54,23 +255,44 @@
     .modal-edit-mode .editable-field { display: block !important; }
     .modal-edit-mode .view-only-badge { display: none !important; }
     .modal-edit-mode .modal-footer-view { display: none !important; }
-    
-    /* Smooth custom drop transition for system notifications */
-    .auto-dismiss-alert {
-        transition: all 0.4s ease-in-out;
-        opacity: 1;
-    }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+<!-- 1. REGISTRY HEADER PROFILE BLOCK -->
+<div class="registry-header-block d-flex justify-content-between align-items-center">
     <div>
-        <h2 class="fw-bold text-slate-800 mb-1">Municipal Services Registry</h2>
-        <p class="text-muted small mb-0">Manage public service pathways and process criteria from this unified screen.</p>
+        <div class="text-uppercase text-light fw-bold text-muted small tracking-wider mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">
+            Malawi Government • Local Government Framework
+        </div>
+        <h3 class="fw-bold text-uppercase m-0 text-light" style="font-size: 1.4rem; letter-spacing: -0.3px;">Municipal Services Registry</h3>
     </div>
     <div>
-        <button type="button" class="btn btn-primary px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#createServiceModal">
-            <i class="fas fa-plus me-2"></i>Add Service Pathway
+        <button type="button" class="btn btn-gov-primary" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+            <i class="fas fa-plus-square me-2"></i> Add Service Pathway
         </button>
+    </div>
+</div>
+
+<!-- 2. REGISTRY INTERFACE GRID BAR -->
+<div class="registry-action-bar">
+    <div class="row g-2 align-items-center">
+        <!-- Search Cell Input -->
+        <div class="col-md-5 col-lg-4">
+            <div class="registry-search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="tableSearch" class="form-control" placeholder="Search parameters (Name, Key, Dept)...">
+            </div>
+        </div>
+        
+        <!-- Status Filter Selection Dropdown -->
+        <div class="col-md-3 col-lg-2">
+            <select id="statusFilter" class="form-select">
+                <option value="all">All Registry Statuses</option>
+                <option value="yes">Active Status [SYS.ACTIVE]</option>
+                <option value="no">Inactive Status [SYS.LOCKED]</option>
+            </select>
+        </div>
+
+        
     </div>
 </div>
 
@@ -89,25 +311,7 @@
     <?php endif; ?>
 </div>
 
-<div class="filter-toolbar p-3 mb-4">
-    <div class="row g-3 align-items-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="search-input-group">
-                <i class="fas fa-search"></i>
-                <input type="text" id="tableSearch" class="form-control" placeholder="Search by name, key, or department...">
-            </div>
-        </div>
-        <div class="col-md-4 col-lg-3">
-            <select id="statusFilter" class="form-select status-select">
-                <option value="all">All Statuses</option>
-                <option value="yes">Active Services</option>
-                <option value="no">Inactive Services</option>
-            </select>
-        </div>
-        <div class="col text-md-end text-muted small" id="filterCount"></div>
-    </div>
-</div>
-
+<!-- DATA GRID MODULE -->
 <div class="card dashboard-card mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -155,7 +359,7 @@
                                     <span class="text-muted mini small"><?= esc($service['service_key']) ?></span>
                                 </td>
                                 <td><span class="badge bg-light text-dark border"><?= esc($service['department']) ?></span></td>
-                                <td><span class="fw-medium text-slate-700">$<?= esc(number_format($service['fee_amount'], 2)) ?></span></td>
+                                <td><span class="fw-medium text-slate-700">MWK <?= esc(number_format($service['fee_amount'], 2)) ?></span></td>
                                 <td><span class="text-slate-600"><i class="far fa-clock me-1 text-muted"></i> <?= esc($service['processing_days']) ?> Days</span></td>
                                 <td>
                                     <?= $service['is_active'] ? '<span class="badge bg-success bg-opacity-10 text-success">Yes</span>' : '<span class="badge bg-secondary bg-opacity-10 text-secondary">No</span>' ?>
@@ -182,6 +386,7 @@
     </div>
 </div>
 
+<!-- CREATION REGISTRY PATHWAY MODAL -->
 <div class="modal fade" id="createServiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
@@ -206,7 +411,7 @@
                             <input type="text" name="department" class="form-control" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Fee ($)</label>
+                            <label class="form-label fw-medium small text-muted">Fee (MWK)</label>
                             <input type="number" step="0.01" name="fee_amount" class="form-control" required>
                         </div>
                         <div class="col-md-3">
@@ -220,7 +425,7 @@
                         <div class="col-md-6 d-flex align-items-end mb-2">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" name="is_active" value="1" checked>
-                                <label class="form-check-label fw-medium">Active Immediately</label>
+                                <label class="form-check-label fw-medium text-dark">Active Immediately</label>
                             </div>
                         </div>
                         <div class="col-12">
@@ -238,7 +443,7 @@
     </div>
 </div>
 
-
+<!-- UNIFIED MANAGEMENT REGISTRY MODAL -->
 <div class="modal fade modal-view-mode" id="unifiedServiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
@@ -251,7 +456,7 @@
                         <h5 class="modal-title fw-bold text-slate-800 me-3" id="modalTitleText">Service Pathway Profile</h5>
                         <div class="form-check form-switch m-0 pt-1">
                             <input class="form-check-input btn-check-toggle-edit" type="checkbox" id="enableEditToggle">
-                            <label class="form-check-label small fw-semibold text-primary" for="enableEditToggle" style="cursor: pointer;">
+                            <label class="form-check-label small fw-semibold" for="enableEditToggle" style="cursor: pointer;">
                                 <i class="fas fa-edit me-1"></i>Edit Mode
                             </label>
                         </div>
@@ -290,7 +495,7 @@
                             <div class="static-text-field form-control-plaintext fw-bold text-success" id="view_fee_amount"></div>
                             <div class="editable-field">
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">MWK</span>
                                     <input type="number" step="0.01" name="fee_amount" id="edit_fee_amount" class="form-control" required>
                                 </div>
                             </div>
@@ -362,12 +567,11 @@
             const targetAlerts = document.querySelectorAll('.auto-dismiss-alert');
             targetAlerts.forEach(function(alertInstance) {
                 setTimeout(function() {
-                    // Use native Bootstrap alert dynamic disposal method
                     const bsAlert = bootstrap.Alert.getOrCreateInstance(alertInstance);
                     if (bsAlert) {
                         bsAlert.close();
                     }
-                }, 3000); // Triggers automatically after exactly 3 seconds
+                }, 4000); 
             });
 
             // --- 2. Client Search Filter ---
@@ -378,8 +582,8 @@
                 let visibleCount = 0;
 
                 tableRows.forEach(row => {
-                    const searchableText = row.getAttribute('data-search');
-                    const activeStatus = row.getAttribute('data-active');
+                    const searchableText = row.getAttribute('data-search') || '';
+                    const activeStatus = row.getAttribute('data-active') || '';
                     if (searchableText.includes(queryValue) && (statusValue === 'all' || activeStatus === statusValue)) {
                         row.style.display = '';
                         visibleCount++;
@@ -387,13 +591,15 @@
                         row.style.display = 'none';
                     }
                 });
-                if (filterCountOutput) filterCountOutput.textContent = `Showing ${visibleCount} of ${tableRows.length} services`;
+                if (filterCountOutput) filterCountOutput.textContent = `ROW COUNT: ${visibleCount} RECORD(S) FOUND`;
             }
             if (searchInput) searchInput.addEventListener('input', filterTable);
             if (statusFilter) statusFilter.addEventListener('change', filterTable);
 
             // --- 3. Unified Modal Frame Engine ---
             const unifiedModalElement = document.getElementById('unifiedServiceModal');
+            if (!unifiedModalElement) return;
+
             const unifiedModal = new bootstrap.Modal(unifiedModalElement);
             const editToggleSwitch = document.getElementById('enableEditToggle');
             const unifiedForm = document.getElementById('unifiedServiceForm');
@@ -408,7 +614,7 @@
                     unifiedModalElement.classList.remove('modal-edit-mode');
                     unifiedModalElement.classList.add('modal-view-mode');
                     document.getElementById('modalTitleText').innerHTML = 'Service Pathway Profile';
-                    editToggleSwitch.checked = false;
+                    if (editToggleSwitch) editToggleSwitch.checked = false;
                 }
             }
 
@@ -417,21 +623,23 @@
                     const row = this.closest('.service-row');
                     const serviceId = row.getAttribute('data-id');
 
-                    unifiedForm.action = `<?= base_url('admin/services') ?>/${serviceId}/edit`;
+                    if (unifiedForm) {
+                        unifiedForm.action = `<?= base_url('admin/services') ?>/${serviceId}/edit`;
+                    }
 
                     // Bind Display text properties
                     document.getElementById('view_service_name').textContent = row.getAttribute('data-name');
                     document.getElementById('view_service_key').textContent = row.getAttribute('data-key');
                     document.getElementById('view_department').textContent = row.getAttribute('data-dept');
-                    document.getElementById('view_fee_amount').textContent = `$${parseFloat(row.getAttribute('data-fee')).toFixed(2)}`;
+                    document.getElementById('view_fee_amount').textContent = `MWK ${parseFloat(row.getAttribute('data-fee')).toFixed(2)}`;
                     document.getElementById('view_processing_days').textContent = `${row.getAttribute('data-days')} Days`;
                     document.getElementById('view_sort_order').textContent = row.getAttribute('data-order');
                     document.getElementById('view_description').textContent = row.getAttribute('data-desc') || 'No description supplied.';
                     
                     const isActive = row.getAttribute('data-active') === 'yes';
                     document.getElementById('view_is_active_badge').innerHTML = isActive 
-                        ? '<span class="badge bg-success bg-opacity-10 text-success">Listed / Active</span>' 
-                        : '<span class="badge bg-secondary bg-opacity-10 text-secondary">Hidden / Suspended</span>';
+                        ? '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20 px-2 py-1">ACTIVE</span>' 
+                        : '<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-20 px-2 py-1">INACTIVE</span>';
 
                     // Synchronize Inputs
                     document.getElementById('edit_service_name').value = row.getAttribute('data-name');
@@ -448,13 +656,17 @@
                 });
             });
 
-            editToggleSwitch.addEventListener('change', function() {
-                setModalMode(this.checked);
-            });
+            if (editToggleSwitch) {
+                editToggleSwitch.addEventListener('change', function() {
+                    setModalMode(this.checked);
+                });
+            }
 
-            cancelEditBtn.addEventListener('click', function() {
-                setModalMode(false);
-            });
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', function() {
+                    setModalMode(false);
+                });
+            }
             
             if (filterCountOutput) filterTable();
         }

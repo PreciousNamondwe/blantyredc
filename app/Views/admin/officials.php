@@ -127,7 +127,7 @@
                                                     data-active="<?= $official['is_active'] ?>">
                                                 <i class="fas fa-pen text-primary me-1"></i> Edit
                                             </button>
-                                            <form method="POST" action="<?= base_url('admin/officials/delete/' . $official['id']) ?>" class="m-0 dynamic-delete-form">
+                                            <form method="POST" action="<?= base_url('admin/officials/' . $official['id'] . '/delete') ?>" class="m-0 dynamic-delete-form">
                                                 <?= csrf_field() ?>
                                                 <button type="submit" class="btn btn-sm btn-white border text-danger shadow-sm px-2.5 btn-delete-submit" title="Remove Profile">
                                                     <i class="fas fa-trash-alt"></i>

@@ -186,6 +186,7 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->post('services/create', 'AdminController::createService');
     $routes->get('services/(:num)/edit', 'AdminController::editService/$1');
     $routes->post('services/(:num)/edit', 'AdminController::editService/$1');
+    $routes->post('services/(:num)/edit', 'AdminController::editService/$1');  // FIXED: ID in middle
     $routes->post('services/(:num)/delete', 'AdminController::deleteService/$1');
     
     $routes->get('business-types', 'AdminController::businessTypes');
@@ -200,6 +201,7 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->post('projects/create', 'AdminController::createProject');
     $routes->get('projects/(:num)/edit', 'AdminController::editProject/$1');
     $routes->post('projects/(:num)/edit', 'AdminController::editProject/$1');
+    $routes->post('projects/(:num)/delete', 'AdminController::deleteProject/$1');
     
     // --- FIXED: COMBINED APPLICATIONS WORKSPACE ACTION ENGINES ---
     $routes->get('applications', 'AdminController::applications');
@@ -208,12 +210,14 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->get('applications/download/(:any)', 'AdminController::download/$1');
     // --------------------------------------------------------------
 
+  // --- OFFICIALS WORKSPACE ---
     $routes->get('officials', 'AdminController::officials');
     $routes->get('officials/create', 'AdminController::createOfficial');
     $routes->post('officials/create', 'AdminController::createOfficial');
     $routes->get('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/edit', 'AdminController::editOfficial/$1');
-    $routes->post('officials/(:num)/delete', 'AdminController::deleteOfficial/$1');
+    // Ensure this line is present inside your admin routes group block:
+    $routes->post('officials/(:num)/delete', 'AdminController::deleteOfficial/$1'); 
     
     $routes->post('management/create', 'AdminController::createManagement');
     $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
@@ -227,8 +231,11 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     // Maps your sidebar link route directly to your notices CRUD functions
     $routes->get('notifications', 'AdminController::notices'); 
     $routes->post('notices/create', 'AdminController::createNotice');
+    $routes->post('notices/create', 'AdminController::createNotice');
     $routes->post('notices/edit/(:num)', 'AdminController::editNotice/$1');
-    $routes->post('notices/delete/(:num)', 'AdminController::deleteNotice/$1');
+    $routes->post('notices/edit/(:num)', 'AdminController::editNotice/$1');
+    // Notice Deletion Endpoint matching your base url template pattern
+    $routes->post('notices/(:num)/delete', 'AdminController::deleteNotice/$1');
 
     $routes->post('projects/delete/(:num)', 'AdminController::deleteProject/$1'); // FIXED: Removed repetitive 'admin/' prefix
     $routes->get('test-project/edit/(:num)', 'TestProject::edit/$1');

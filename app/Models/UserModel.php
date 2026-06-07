@@ -32,13 +32,17 @@ class UserModel extends Model
 
     // Validation
     protected $validationRules = [
+        // Cleaned up validation strings to handle both inserts and updates safely
         'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username,id,{id}]',
-        'email' => 'required|valid_email|max_length[255]|is_unique[users.email,id,{id}]',
-        'password_hash' => 'required',
-        'full_name' => 'required|max_length[255]',
-        'role' => 'required|in_list[admin,department_head,staff,reviewer]',
-        'department' => 'max_length[100]',
-        'phone' => 'max_length[20]'
+        'email'    => 'required|valid_email|max_length[255]|is_unique[users.email,id,{id}]',
+        
+        // VALIDATION TARGET CHANGED FROM 'password_hash' TO 'password'
+        'password' => 'required|min_length[8]', 
+        
+        'full_name'  => 'required|max_length[255]',
+        'role'       => 'required|in_list[admin,department_head,staff,reviewer]',
+        'department' => 'permit_empty|max_length[100]',
+        'phone'      => 'permit_empty|max_length[20]'
     ];
 
     // Callbacks

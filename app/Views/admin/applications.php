@@ -138,7 +138,7 @@
 <div class="gov-banner-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
     <div class="gov-title-seal">
         <h4 class="fw-bold tracking-tight mb-1 text-uppercase text-white" id="viewTitle" style="letter-spacing: 0.5px;">
-            <?= esc($page_title ?? 'Service Applications Log') ?>
+            <?= esc($page_title ?? 'Service Applications') ?>
         </h4>
         <div class="small opacity-75 text-white font-monospace-gov" style="font-size: 0.75rem;">
             BLANTYRE DISTRICT COUNCIL &bull; REPUBLIC OF MALAWI CENTRAL INTEGRATED REGISTRY SYSTEM

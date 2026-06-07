@@ -192,28 +192,70 @@ public function updateBusinessInline()
         return redirect()->to('admin/services');
     }
 
-    /**
-     * UNIFIED MODAL UPDATE TARGET ACTION
-     */
-    public function editService($id = null)
+/**
+ * UNIFIED MODAL UPDATE TARGET ACTION
+ */
+public function editService($id = null)
+{
+    if ($id === null) {
+        return redirect()->to(base_url('admin/services'))->with('error', 'Missing service identification key.');
+    }
+
+    $serviceModel = new \App\Models\ServiceModel(); 
+    $service = $serviceModel->find($id);
+    
+    if (!$service) {
+        return redirect()->to(base_url('admin/services'))->with('error', 'The target service registry key cannot be found.');
+    }
+
+    if ($this->request->is('post')) {
+        $formData = $this->request->getPost();
+        
+        // Ensure standard toggle checkbox mapping
+        $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
+
+        if (empty($formData['sort_order'])) {
+            $formData['sort_order'] = 0;
+        }
+
+        // Trick CodeIgniter 4 validation into knowing the validation context ID
+        $serviceModel->setValidationRule('service_key', "required|max_length[100]|is_unique[services.service_key,id,{$id}]");
+
+        // Force explicit update targeting
+        if ($serviceModel->update($id, $formData)) {
+            return redirect()->to(base_url('admin/services'))->with('success', 'Changes updated cleanly onto database registry.');
+        } else {
+            // This will capture and display the exact validation errors on screen so you can see what failed
+            $errorString = implode('<br>', $serviceModel->errors() ?: ['Database rejected write execution configuration.']);
+            return redirect()->to(base_url('admin/services'))->withInput()->with('error', $errorString);
+        }
+    }
+    
+    return redirect()->to(base_url('admin/services'));
+}
+
+    public function deleteService($id = null)
     {
-        $service = $this->serviceModel->find($id);
+        // 1. Safety check to ensure an ID actually arrived
+        if ($id === null) {
+            return redirect()->to(base_url('admin/services'))->with('error', 'Invalid Service ID requested.');
+        }
+
+        // 2. Initialize your model (replace with your actual Model name)
+        $serviceModel = new \App\Models\ServiceModel(); 
+
+        // 3. Check if the record actually exists in your database
+        $service = $serviceModel->find($id);
         if (!$service) {
-            return redirect()->to('admin/services')->with('error', 'The target service registry key cannot be loaded.');
+            return redirect()->to(base_url('admin/services'))->with('error', 'Service pathway record not found.');
         }
 
-        if ($this->request->is('post')) {
-            $formData = $this->request->getPost();
-            $formData['id'] = $id; // Force update constraint match
-            $formData['is_active'] = isset($formData['is_active']) ? 1 : 0;
-
-            if ($this->serviceModel->save($formData)) {
-                return redirect()->to('admin/services')->with('success', 'Changes updated cleanly onto current dashboard record.');
-            } else {
-                return redirect()->to('admin/services')->withInput()->with('error', implode('<br>', $this->serviceModel->errors()));
-            }
+        // 4. Perform the deletion block
+        if ($serviceModel->delete($id)) {
+            return redirect()->to(base_url('admin/services'))->with('success', 'Service pathway purged successfully.');
+        } else {
+            return redirect()->to(base_url('admin/services'))->with('error', 'Database restriction prevented deletion.');
         }
-        return redirect()->to('admin/services');
     }
 
 /**
@@ -275,7 +317,7 @@ public function updateBusinessInline()
      * PURGE SYSTEM PROJECT SPECIFICATION RECORDS
      */
     public function deleteProject($id)
-    {
+    {   
         if ($this->projectModel->find($id)) {
             $this->projectModel->delete($id);
             return redirect()->to('admin/projects')->with('success', 'Project execution node scrubbed.');
@@ -455,28 +497,43 @@ public function updateBusinessInline()
     /**
      * Delete elected official via Modal Trigger
      */
-    public function deleteOfficial($id)
-    {
-        if (!$this->request->is('post')) {
-            return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Invalid request method');
-        }
-
-        $official = $this->officialModel->find($id);
-        if (!$official) {
-            return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Official data asset missing.');
-        }
-
-        try {
-            if (!empty($official['photo']) && file_exists(FCPATH . $official['photo'])) {
-                @unlink(FCPATH . $official['photo']);
-            }
-            $this->officialModel->delete($id);
-            return redirect()->to(base_url('admin/officials?tab=officials'))->with('success', 'Official profile removed safely.');
-        } catch (\Exception $e) {
-            log_message('error', 'Failed to delete official: ' . $e->getMessage());
-            return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Failed to complete deletion routing workflow.');
-        }
+ public function deleteOfficial($id = null)
+{
+    // 1. Instantly check if an ID was passed at all
+    if ($id === null) {
+        return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Missing official identifier asset key.');
     }
+
+    // 2. Safeguard request context verification
+    $method = strtolower($this->request->getMethod());
+    if ($method !== 'post') {
+        return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Invalid request method context submission.');
+    }
+
+    // 3. FIXED: Explicitly load the model matching your exact class name
+    $electedOfficialModel = new \App\Models\ElectedOfficialModel();
+
+    // 4. FIXED: Use the local variable instead of $this->officialModel
+    $official = $electedOfficialModel->find($id);
+    if (!$official) {
+        return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Official data asset missing.');
+    }
+
+    try {
+        // 5. Clean up associated profile image file from the disk if present
+        if (!empty($official['photo']) && file_exists(FCPATH . $official['photo'])) {
+            @unlink(FCPATH . $official['photo']);
+        }
+        
+        // 6. FIXED: Execute deletion on the local model instance
+        $electedOfficialModel->delete($id);
+        
+        return redirect()->to(base_url('admin/officials?tab=officials'))->with('success', 'Official profile removed safely.');
+    } catch (\Exception $e) {
+        log_message('error', 'Failed to delete official: ' . $e->getMessage());
+        return redirect()->to(base_url('admin/officials?tab=officials'))->with('error', 'Failed to complete deletion routing workflow.');
+    }
+}
 
     /**
      * Create Management Profile Member via Modal Context
@@ -693,19 +750,6 @@ public function updateBusinessInline()
     }
    
     /**
-     * 8. FINANCE & REVENUE AUDIT BLOCK
-     */
-    public function payments()
-    {
-        $data = [
-            'page_title'   => 'Transactional Invoicing Logs',
-            'page'         => 'payments', 
-            'transactions' => $this->paymentModel->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
-
-    /**
      * View Modal Target Component Data
      */
     public function viewModal($id = null)
@@ -777,19 +821,6 @@ public function updateBusinessInline()
                         ->setStatusCode(500)
                         ->setBody('<div class="alert alert-danger m-3">Internal server error loading application details.</div>');
         }
-    }
-
-    /**
-     * 9. DISPATCH PIPELINES & ALERTS
-     */
-    public function notifications()
-    {
-        $data = [
-            'page_title'    => 'Alert Notifications Stream',
-            'page'          => 'notifications', 
-            'notifications' => $this->notificationModel->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
     }
 
     /**
@@ -885,7 +916,42 @@ public function updateBusinessInline()
         }
         return redirect()->to(base_url('admin/notifications'));
     }
+    /**
+ * UNIFIED PUBLIC NOTICE DELETION ENGINE ACTION
+ */
+public function deleteNotice($id = null)
+{
+    // 1. Fallback barrier if no ID is passed
+    if ($id === null) {
+        return redirect()->to(base_url('admin/notifications'))->with('error', 'Missing notice identification asset key.');
+    }
 
+    // 2. Safeguard request context verification (Ensures POST submission execution)
+    $method = strtolower($this->request->getMethod());
+    if ($method !== 'post') {
+        return redirect()->to(base_url('admin/notifications'))->with('error', 'Invalid request method context submission.');
+    }
+
+    // 3. Fallback: Initialize model locally if $this->noticesModel is ever uninstantiated
+    $noticesModel = $this->noticesModel ?? new \App\Models\NoticeModel(); // Adjust namespace if your model has a different name
+
+    // 4. Locate the existing entry registry row to make sure it exists
+    $notice = $noticesModel->find($id);
+    if (!$notice) {
+        return redirect()->to(base_url('admin/notifications'))->with('error', 'The target bulletin registry entry cannot be found.');
+    }
+
+    try {
+        // 5. Execute deletion on the target record row
+        $noticesModel->delete($id);
+        
+        return redirect()->to(base_url('admin/notifications'))->with('success', 'Public board alert bulletin removed safely.');
+    } catch (\Exception $e) {
+        // Log the exact database or processing problem quietly behind the scenes
+        log_message('error', 'Failed to delete notice registry item: ' . $e->getMessage());
+        return redirect()->to(base_url('admin/notifications'))->with('error', 'System internal constraint rejected deletion routing workflow.');
+    }
+}
 
     /**
      * 3. USER MANAGEMENT CONTROLS
@@ -920,40 +986,42 @@ public function updateBusinessInline()
         
         return view('admin/layout/admin_master', $data);
     }
-
-    public function createUser()
-    {
-        // STRICT RBAC GATE: Only 'admin' can execute provisions
-        if (session()->get('role') !== 'admin') {
-            return redirect()->to('admin/users')->with('errors', ['Unauthorized Action: Only Administrators can provision new system nodes.']);
-        }
-
-        if ($this->request->is('post')) {
-            $formData = [
-                'full_name'  => $this->request->getPost('full_name'),
-                'username'   => $this->request->getPost('username'),
-                'email'      => $this->request->getPost('email'),
-                'password'   => $this->request->getPost('password'), // Caught and processed into password_hash by the model's callback
-                'role'       => $this->request->getPost('role'),
-                'department' => $this->request->getPost('department'),
-                'phone'      => $this->request->getPost('phone'),
-                'is_active'  => 1 
-            ];
-
-            if ($this->userModel->insert($formData)) {
-                return redirect()->to('admin/users')->with('success', 'User access context instantiated successfully.');
-            } else {
-                return redirect()->to('admin/users')->withInput()->with('errors', $this->userModel->errors());
-            }
-        }
-
-        $data = [
-            'page_title' => 'Register System Account',
-            'page'       => 'users_create' 
-        ];
-        return view('admin/layout/admin_master', $data);
+/**
+ * ADMINISTRATIVE SECURITY USER CREATION LOGIC
+ */
+public function createUser()
+{
+    // 1. Guard check access permissions
+    if (session()->get('role') !== 'admin') {
+        return redirect()->to(base_url('admin/users'))->with('error', 'Unauthorized administrative clearance access.');
     }
 
+    if ($this->request->is('post')) {
+        $userModel = new \App\Models\UserModel();
+
+        // 2. Map all standard incoming view data items
+        $formData = [
+            'username'   => $this->request->getPost('username'),
+            'email'      => $this->request->getPost('email'),
+            'password'   => $this->request->getPost('password'), // Validated by updated Model rule
+            'full_name'  => $this->request->getPost('full_name'),
+            'role'       => $this->request->getPost('role'),
+            'department' => $this->request->getPost('department') ?: null,
+            'phone'      => $this->request->getPost('phone') ?: null,
+            'is_active'  => 1 // Default status active on initial instantiation
+        ];
+
+        // 3. Fire database insert action execution
+        if ($userModel->insert($formData)) {
+            return redirect()->to(base_url('admin/users'))->with('success', 'Security profile node provisioned successfully into core directory matrix.');
+        } else {
+            // Send back errors cleanly if the values violate uniqueness or size checks
+            return redirect()->back()->withInput()->with('errors', $userModel->errors());
+        }
+    }
+
+    return redirect()->to(base_url('admin/users'));
+}
     public function editUser($id = null)
     {
         // STRICT RBAC GATE: Only 'admin' can overwrite identity vectors
@@ -1029,4 +1097,6 @@ public function updateBusinessInline()
         $maxOrder = isset($maxOrderRow['sort_order']) ? (int)$maxOrderRow['sort_order'] : 0;
         return $maxOrder + 1;
     }
+
+    
 }

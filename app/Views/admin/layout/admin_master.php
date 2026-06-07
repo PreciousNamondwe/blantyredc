@@ -11,26 +11,34 @@
     
     <style>
         :root {
-            --bg-main: #f8fafc;
-            --sidebar-bg: #0f172a;
-            --sidebar-border: #1e293b;
-            --text-muted: #94a3b8;
-            --text-dark: #334155;
-            --accent-primary: #0284c7; /* Vibrant UI Accent Blue */
-            --accent-hover: #1e293b;
-            --danger-soft: #ef4444;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-            --sidebar-width: 260px;
+            /* Your Exact Government & Excel Custom Variables */
+            --gov-navy-primary: #1a3352;
+            --gov-navy-hover: #112237;
+            --gov-gold: #d4af37;
+            --gov-gold-light: #fdfaf2;
+            --gov-border: #ccd4dc;
+            --gov-bg-muted: #f5f7fa;
+            --gov-text: #2d3748;
+            --excel-border: #d0d7de;
+            --excel-header-bg: #f6f8fa;
+            
+            /* Structural Variables mapped to your specific design spec tokens */
+            --bg-main: var(--gov-bg-muted);
+            --sidebar-bg: var(--gov-navy-primary);
+            --sidebar-border: #23436b;
+            --text-muted: #a0aec0;
+            --sidebar-width: 280px; /* Expanded slightly for the brand text layout */
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
-            color: var(--text-dark);
+            color: var(--gov-text);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Responsive Sidebar */
+        /* Responsive Sidebar matching Gov Navy Specifications */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -45,65 +53,61 @@
         }
         
         .sidebar-brand {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--sidebar-border);
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            padding: 1.5rem 1.25rem;
+            border-bottom: 3px solid var(--gov-gold);
+            background: var(--gov-navy-hover);
         }
 
         .sidebar .nav {
-            padding: 1rem;
+            padding: 1rem 0.75rem;
         }
 
         .sidebar .nav-link {
             color: var(--text-muted);
             font-weight: 500;
-            font-size: 0.925rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-bottom: 0.35rem;
+            font-size: 0.9rem;
+            padding: 0.7rem 1rem;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+            margin-bottom: 0.25rem;
             display: flex;
             align-items: center;
         }
         
         .sidebar .nav-link i.main-icon {
             width: 24px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-right: 0.75rem;
             transition: transform 0.2s ease;
         }
 
         .sidebar .nav-link:hover { 
             color: #fff; 
-            background: var(--accent-hover); 
-        }
-
-        .sidebar .nav-link:hover i.main-icon {
-            transform: scale(1.05);
+            background: var(--gov-navy-hover); 
         }
 
         .sidebar .nav-link.active { 
             color: #fff; 
-            background: var(--accent-primary);
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: inset 4px 0 0 var(--gov-gold);
+            border-radius: 0 4px 4px 0;
         }
 
         .sidebar .nav-link.active i.main-icon {
-            color: #fff !important;
+            color: var(--gov-gold) !important;
         }
         
         .text-danger-hover:hover {
-            background: rgba(239, 68, 68, 0.1) !important;
-            color: var(--danger-soft) !important;
+            background: rgba(229, 62, 62, 0.1) !important;
+            color: #e53e3e !important;
         }
 
-        /* Top Navbar (For Mobile/Actions) */
+        /* Top Navbar Architecture */
         .top-navbar {
             margin-left: var(--sidebar-width);
             height: 70px;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-bottom: 1px solid var(--excel-border);
             display: flex;
             align-items: center;
             padding: 0 2rem;
@@ -112,32 +116,22 @@
             z-index: 1030;
         }
 
-        /* Main Content Workspace */
+        /* Main Workspace Canvas */
         .main-content {
             margin-left: var(--sidebar-width);
-            padding: 2rem;
+            padding: 1.75rem;
             min-height: calc(100vh - 70px);
         }
 
-        /* Modernized Component Placeholders matching UI design */
-        .stat-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.2s ease;
-            background: #fff;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-        }
-
-        .dashboard-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            box-shadow: var(--card-shadow);
-            background: #fff;
+        /* Badge/Initial Seal Syncing */
+        .avatar-seal {
+            width: 40px;
+            height: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background-color: var(--gov-gold-light);
+            color: var(--gov-navy-primary);
+            border: 1px solid var(--gov-gold);
         }
 
         /* Responsive Breakpoints */
@@ -152,6 +146,9 @@
                 margin-left: 0;
                 padding: 0 1rem;
             }
+            .sidebar-brand {
+                padding: 1.5rem 1rem;
+            }
             .main-content {
                 margin-left: 0;
                 padding: 1.25rem;
@@ -163,10 +160,13 @@
 
     <div class="sidebar" id="sidebarMenu">
         <div class="sidebar-brand d-flex align-items-center justify-content-between">
-            <h5 class="text-white m-0 d-flex align-items-center">
-                <i class="fas fa-layer-group text-info me-2"></i>
-                <span class="fw-semibold">Admin Panel</span>
-            </h5>
+            <h6 class="text-white m-0 d-flex align-items-center tracking-wider text-uppercase fw-bold" style="letter-spacing: 0.5px; font-size: 0.95rem;">
+                <img src="<?= base_url('favicon.ico') ?>" 
+                     alt="Gov Emblem" 
+                     class="me-2.5" 
+                     style="width: 80px; height: 80px; object-fit: contain; min-width: 32px;">
+                <span class="lh-sm" style="display: inline-block;">Blantyre District<br><small style="font-size: 0.725rem; opacity: 0.85; font-weight: 500; letter-spacing: 0.2px;">Council Panel</small></span>
+            </h6>
             <button type="button" class="btn-close btn-close-white d-lg-none" onclick="toggleSidebar()"></button>
         </div>
         
@@ -227,7 +227,7 @@
                 </a>
             </li>
             
-            <li class="nav-item mt-4 pt-3 border-top border-secondary">
+            <li class="nav-item mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
                 <a class="nav-link text-danger-hover" href="<?= base_url('logout') ?>">
                     <i class="fas fa-sign-out-alt main-icon text-danger"></i>
                     <span>Logout</span>
@@ -237,12 +237,13 @@
     </div>
 
     <div class="top-navbar d-flex justify-content-between align-items-center">
-        <button class="btn btn-light d-lg-none me-2" type="button" onclick="toggleSidebar()">
+        <button class="btn btn-light d-lg-none me-2" type="button" onclick="toggleSidebar()" style="border: 1px solid var(--excel-border);">
             <i class="fas fa-bars"></i>
         </button>
         
         <div class="d-none d-sm-flex align-items-center">
-            <h4 class="m-0 fw-bold text-dark text-capitalize"><?= esc($page ?? 'Dashboard') ?></h4>
+            <span class="badge me-2 text-uppercase font-monospace-gov" style="background-color: var(--gov-navy-primary); font-size: 0.7rem; letter-spacing: 0.5px;">System Node</span>
+            <h5 class="m-0 fw-bold text-dark text-capitalize" style="font-size: 1.1rem; color: var(--gov-navy-primary) !important;"><?= esc($page ?? 'Dashboard') ?></h5>
         </div>
         
         <div class="d-flex align-items-center gap-3 ms-auto">
@@ -252,10 +253,10 @@
             </div>
             <div class="d-flex align-items-center">
                 <div class="text-end d-none d-md-block me-2">
-                    <p class="m-0 small fw-bold lh-1">Blantyre Admin</p>
-                    <span class="text-muted extra-small" style="font-size: 0.75rem;">Super Admin</span>
+                    <p class="m-0 small fw-bold lh-1" style="color: var(--gov-navy-primary);">Blantyre Admin</p>
+                    <span class="text-muted extra-small" style="font-size: 0.725rem;">Super Administrative Principal</span>
                 </div>
-                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">
+                <div class="rounded-circle avatar-seal d-flex align-items-center justify-content-center">
                     BA
                 </div>
             </div>
@@ -268,7 +269,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Simple and robust mobile toggle wrapper 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
             sidebar.classList.toggle('show');
