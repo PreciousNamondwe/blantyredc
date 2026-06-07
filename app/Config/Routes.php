@@ -93,12 +93,22 @@ $routes->add('email/compose', 'Email::compose');
 $routes->post('email/send-email', 'Email::send_email');
 $routes->add('contact-us','ContactUs::index');
 $routes->add('contact-us/send-email','ContactUs::send_email');
-// Ensure this specific path maps directly to your controller method
-$routes->post('applications/complaint', 'ApplicationController::createComplaint');
-// Also provide the multipart image handling hook matching your JavaScript request loop
-$routes->post('applications/(:num)/documents', 'ApplicationController::saveUploadedFile/$1');
-$routes->get('applications/complaints', 'ApplicationController::getComplaints');
-$routes->get('applications/status/(:num)', 'ApplicationController::status/$1');
+
+
+$routes->get('marriage-certificates', 'MarriageCertificateController::index');
+$routes->post('marriage-certificates/store', 'MarriageCertificateController::store');
+// ============================================================================
+// ONLINE BUSINESS LICENSING ROUTES
+// ============================================================================
+$routes->group('business-license', function($routes) {
+    // Route to load and view the application form page
+    // URL: http://localhost/Blantyre-District-council-web-App/public/business-license
+    $routes->get('/', 'BusinessLicenseController::index');
+    
+    // Route to handle the POST submission of the application form data and ID upload
+    // URL: http://localhost/Blantyre-District-council-web-App/public/business-license/submit
+    $routes->post('submit', 'BusinessLicenseController::submit');
+});
 // Web Workspace View Route
 $routes->get('applications/show/(:num)', 'ApplicationController::showWeb/$1');
 // API Routes for Digital Forms
@@ -128,9 +138,7 @@ $routes->group('api', function($routes) {
 
     // Admin routes
     $routes->group('admin', ['filter' => 'admin'], function($routes) {
-        $routes->get('dashboard', 'Api\AdminController::dashboard');
-        $routes->get('applications', 'Api\AdminController::applications');
-        $routes->post('applications/(:num)/status', 'Api\AdminController::updateApplicationStatus/$1');
+        $routes->get('applications', 'AdminController::applications');
         $routes->get('users', 'Api\AdminController::users');
         $routes->post('users', 'Api\AdminController::createUser');
         $routes->put('users/(:num)', 'Api\AdminController::updateUser/$1');
@@ -158,91 +166,72 @@ $routes->group('api', function($routes) {
         $routes->get('applications', 'Api\ApplicationController::assignedApplications');
         $routes->post('applications/(:num)/review', 'Api\ApplicationController::submitReview/$1');
     });
-
-    // Public routes (no auth required)
-    $routes->get('services', 'Api\ApplicationController::services');
-    $routes->get('services/(:num)', 'Api\ApplicationController::serviceDetails/$1');
-    $routes->post('applications/track', 'Api\ApplicationController::trackApplication');
-    
     // Public notices API routes
     $routes->get('notices/urgent', 'NoticesController::getUrgentNotices');
     $routes->get('notices/recent', 'NoticesController::getRecentNotices');
     $routes->get('notices/search', 'NoticesController::search');
 });
-
+    
 // Admin Dashboard Routes (Web Interface)
 $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     $routes->get('dashboard', 'AdminController::dashboard');
-    $routes->get('applications', 'AdminController::applications');
-    $routes->get('business-applications', 'AdminController::businessApplications');
-    $routes->get('business-applications/(:num)/edit', 'AdminController::editBusinessApplication/$1');
-    $routes->post('business-applications/(:num)/edit', 'AdminController::editBusinessApplication/$1');
-    $routes->post('business-applications/(:num)/delete', 'AdminController::deleteBusinessApplication/$1');
-    $routes->get('business-applications/(:num)/print', 'AdminController::printBusinessApplication/$1');
-    $routes->post('api/applications/update-details/(:num)', '\App\Controllers\Api\ApplicationController::updateApplicantDetails/$1');
-    $routes->get('business-applications/(:num)/pdf', 'AdminController::downloadBusinessApplicationPdf/$1');
-    $routes->get('applications/(:num)', 'AdminController::applicationDetails/$1');
-    $routes->get('applications/(:num)/print', 'AdminController::printApplication/$1');
-    $routes->post('applications/(:num)/status', 'AdminController::updateApplicationStatus/$1');
-    $routes->get('applications/view-modal/(:num)', 'AdminController::viewModal/$1');
+    
     $routes->get('users', 'AdminController::users');
-    $routes->get('users/create', 'AdminController::createUser');
     $routes->post('users/create', 'AdminController::createUser');
-    $routes->get('users/(:num)/edit', 'AdminController::editUser/$1');
-    $routes->post('users/(:num)/edit', 'AdminController::editUser/$1');
-    $routes->post('users/(:num)/delete', 'AdminController::deleteUser/$1');
+    $routes->post('users/edit/(:num)', 'AdminController::editUser/$1');
+    $routes->post('users/delete/(:num)', 'AdminController::deleteUser/$1');
+    
     $routes->get('services', 'AdminController::services');
     $routes->get('services/create', 'AdminController::createService');
     $routes->post('services/create', 'AdminController::createService');
     $routes->get('services/(:num)/edit', 'AdminController::editService/$1');
     $routes->post('services/(:num)/edit', 'AdminController::editService/$1');
     $routes->post('services/(:num)/delete', 'AdminController::deleteService/$1');
+    
     $routes->get('business-types', 'AdminController::businessTypes');
     $routes->get('business-types/create', 'AdminController::createBusinessType');
     $routes->post('business-types/create', 'AdminController::createBusinessType');
     $routes->get('business-types/(:num)/edit', 'AdminController::editBusinessType/$1');
     $routes->post('business-types/(:num)/edit', 'AdminController::editBusinessType/$1');
     $routes->post('business-types/(:num)/delete', 'AdminController::deleteBusinessType/$1');
+    
     $routes->get('projects', 'AdminController::projects');
     $routes->get('projects/create', 'AdminController::createProject');
     $routes->post('projects/create', 'AdminController::createProject');
     $routes->get('projects/(:num)/edit', 'AdminController::editProject/$1');
     $routes->post('projects/(:num)/edit', 'AdminController::editProject/$1');
     
+    // --- FIXED: COMBINED APPLICATIONS WORKSPACE ACTION ENGINES ---
+    $routes->get('applications', 'AdminController::applications');
+    $routes->get('applications/download/(:any)', 'AdminController::downloadApplicationPdf/$1');
+    $routes->get('applications/delete/(:any)', 'AdminController::deleteApplicationAction/$1');
+    // --------------------------------------------------------------
+
     $routes->get('officials', 'AdminController::officials');
     $routes->get('officials/create', 'AdminController::createOfficial');
     $routes->post('officials/create', 'AdminController::createOfficial');
     $routes->get('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/edit', 'AdminController::editOfficial/$1');
     $routes->post('officials/(:num)/delete', 'AdminController::deleteOfficial/$1');
+    
     $routes->post('management/create', 'AdminController::createManagement');
     $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
     $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');
    
-    $routes->get('payments', 'AdminController::payments');
-    $routes->get('notifications', 'AdminController::notifications');
-    $routes->post('notifications/(:num)/to-notice', 'AdminController::notificationToNotice/$1');
     $routes->get('news', 'AdminController::news');
-    $routes->get('news/create', 'AdminController::createNews');
     $routes->post('news/create', 'AdminController::createNews');
-    $routes->get('news/(:num)/edit', 'AdminController::editNews/$1');
     $routes->post('news/(:num)/edit', 'AdminController::editNews/$1');
     $routes->post('news/(:num)/delete', 'AdminController::deleteNews/$1');
-
-    // Notices management routes
-    $routes->get('notices', 'AdminController::notices');
-    $routes->get('notices/create', 'AdminController::createNotice');
+    
+    // Maps your sidebar link route directly to your notices CRUD functions
+    $routes->get('notifications', 'AdminController::notices'); 
     $routes->post('notices/create', 'AdminController::createNotice');
-    $routes->get('notices/(:num)/edit', 'AdminController::editNotice/$1');
-    $routes->post('notices/(:num)/edit', 'AdminController::editNotice/$1');
-    $routes->post('notices/(:num)/delete', 'AdminController::deleteNotice/$1');
-    $routes->post('notices/(:num)/publish', 'AdminController::publishNotice/$1');
-    $routes->post('notices/(:num)/archive', 'AdminController::archiveNotice/$1');
+    $routes->post('notices/edit/(:num)', 'AdminController::editNotice/$1');
+    $routes->post('notices/delete/(:num)', 'AdminController::deleteNotice/$1');
 
-    $routes->post('admin/projects/delete/(:num)', 'AdminController::deleteProject/$1');
+    $routes->post('projects/delete/(:num)', 'AdminController::deleteProject/$1'); // FIXED: Removed repetitive 'admin/' prefix
     $routes->get('test-project/edit/(:num)', 'TestProject::edit/$1');
     $routes->post('test-project/update/(:num)', 'TestProject::update/$1');
-    
 });
 
 // Public notices routes (defined after admin routes to prevent conflicts)
@@ -250,6 +239,7 @@ $routes->get('tenders', 'NoticesController::index');
 $routes->get('tenders/(:any)', 'NoticesController::detail/$1');
 $routes->get('notices', 'NoticesController::index');
 $routes->get('notices/(:any)', 'NoticesController::detail/$1');
+
 
 
 /*

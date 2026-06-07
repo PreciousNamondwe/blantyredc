@@ -2,223 +2,86 @@
 
 namespace App\Controllers;
 
-use App\Services\BusinessLicenseService;
-use App\Models\BusinessLicenseModel;
-use App\Models\ApplicationModel;
-use App\Models\BusinessTypeModel;
-use CodeIgniter\API\ResponseTrait;
+use App\Controllers\BaseController;
+use App\Models\BusinessLicenseModel; // Updated class link reference location
 
 class BusinessLicenseController extends BaseController
 {
-    use ResponseTrait;
-
-    protected $licenseService;
-    protected $licenseModel;
-    protected $applicationModel;
-
-    public function __construct()
-    {
-        $this->licenseService = new BusinessLicenseService();
-        $this->licenseModel = new BusinessLicenseModel();
-        $this->applicationModel = new ApplicationModel();
-    }
-
     /**
-     * Display business license application form
-     * GET /business-license
+     * Renders the primary application layout form page
      */
     public function index()
     {
-        $businessTypeModel = new BusinessTypeModel();
-        return view('business-license/index', [
-            'businessTypes' => $businessTypeModel->getActiveTypes(),
-        ]);
+        return view('business-license/index');
     }
 
     /**
-     * Submit business license application
-     * POST /api/business-license/submit
+     * Processes submission data sent from the online portal form
      */
     public function submit()
     {
-        // Get form data
-        $formData = $this->request->getPost();
-        
-        // Get uploaded files
-        $files = $this->request->getFiles();
-
-        try {
-            $result = $this->licenseService->createApplication($formData, $files);
-
-            return $this->respondCreated([
-                'status' => 'success',
-                'message' => 'Business license application submitted successfully',
-                'reference' => $result['reference_number'],
-                'data' => [
-                    'application_id' => $result['application_id'],
-                    'license_id' => $result['license_id']
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
+        // Block direct URL GET processing attempts
+        if ($this->request->getMethod() !== 'POST') {
+            return redirect()->to(base_url('business-license'));
         }
-    }
 
-    /**
-     * Get business license by application ID
-     * GET /api/business-license/:applicationId
-     */
-    public function getLicense($applicationId)
-    {
-        try {
-            $license = $this->licenseService->getLicenseByApplicationId($applicationId);
+        $model = new BusinessLicenseModel();
 
-            if (!$license) {
-                return $this->failNotFound('Business license not found');
+        // 1. Process the Mandatory National ID File Stream upload
+        $idImageFile = $this->request->getFile('owner_id_image');
+        $idImagePath = '';
+
+        if ($idImageFile && $idImageFile->isValid() && !$idImageFile->hasMoved()) {
+            $validatedExtension = $idImageFile->getExtension();
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
+
+            if (in_array(strtolower($validatedExtension), $allowedExtensions)) {
+                $ownerNID = strtoupper(trim($this->request->getPost('owner_national_id')));
+                $newFileName = 'ID_' . $ownerNID . '_' . time() . '.' . $validatedExtension;
+                
+                // Save onto the server disk under public/uploads/national_ids/
+                $idImageFile->move(FCPATH . 'uploads/national_ids', $newFileName);
+                $idImagePath = 'uploads/national_ids/' . $newFileName;
+            } else {
+                return redirect()->back()->withInput()->with('error', 'Invalid ID document format. Only JPG, PNG, and PDF are acceptable.');
             }
-
-            return $this->respond($license);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
-        }
-    }
-
-    /**
-     * Update business license status (Admin only)
-     * POST /api/business-license/:id/status
-     */
-    public function updateStatus($id)
-    {
-        // Check if user is admin
-        if (!session()->get('role') === 'admin') {
-            return $this->failForbidden('Insufficient permissions');
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Mandatory National ID image copy upload is missing or corrupt.');
         }
 
-        $status = $this->request->getPost('status');
-        $notes = $this->request->getPost('notes');
-        $userId = session()->get('user_id');
+        // 2. Map payload array metrics directly to table expectations
+        $isFormal = $this->request->getPost('is_formal_sector') ? 1 : 0;
+        $appCode  = $model->generateApplicationCode();
 
-        if (!$status) {
-            return $this->failValidationErrors(['status' => 'Status is required']);
-        }
+        $formData = [
+            'application_code'          => $appCode,
+            'application_type'          => $this->request->getPost('application_type'),
+            'current_stage'             => 'submitted', // Triggers processing pipeline routing state
+            'submission_date'           => date('Y-m-d H:i:s'),
+            'business_name'             => strip_tags(trim($this->request->getPost('business_name'))),
+            'business_type'             => strip_tags(trim($this->request->getPost('business_type'))),
+            'business_category'         => $this->request->getPost('business_category'),
+            'owner_name'                => strip_tags(trim($this->request->getPost('owner_name'))),
+            'owner_national_id'         => $ownerNID,
+            'owner_id_image'            => $idImagePath,
+            'owner_phone'               => strip_tags(trim($this->request->getPost('owner_phone'))),
+            'traditional_authority'     => strip_tags(trim($this->request->getPost('traditional_authority'))),
+            'village_or_area'           => strip_tags(trim($this->request->getPost('village_or_area'))),
+            'physical_address'          => strip_tags(trim($this->request->getPost('physical_address'))),
+            'trading_name'              => $this->request->getPost('trading_name') ?: null,
+            'owner_email'               => $this->request->getPost('owner_email') ?: null,
+            'plot_number'               => $this->request->getPost('plot_number') ?: null,
+            'is_formal_sector'          => $isFormal,
+            'mbrs_registration_number'  => ($isFormal) ? strip_tags(trim($this->request->getPost('mbrs_registration_number'))) : null,
+            'mra_tpin'                  => ($isFormal) ? strip_tags(trim($this->request->getPost('mra_tpin'))) : null,
+            'estimated_annual_turnover' => ($isFormal) ? floatval($this->request->getPost('estimated_annual_turnover')) : 0.00,
+        ];
 
-        try {
-            $this->licenseService->updateLicenseStatus($id, $status, $notes, $userId);
-
-            return $this->respond([
-                'status' => 'success',
-                'message' => 'Business license status updated successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
-        }
-    }
-
-    /**
-     * Search business licenses
-     * GET /api/business-license/search?q=query
-     */
-    public function search()
-    {
-        $query = $this->request->getGet('q');
-        $limit = $this->request->getGet('limit') ?? 50;
-        $offset = $this->request->getGet('offset') ?? 0;
-
-        if (!$query) {
-            return $this->failValidationErrors(['q' => 'Search query is required']);
-        }
-
-        try {
-            $licenses = $this->licenseService->searchLicenses($query, $limit, $offset);
-
-            return $this->respond([
-                'status' => 'success',
-                'data' => $licenses,
-                'count' => count($licenses)
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
-        }
-    }
-
-    /**
-     * Get business license statistics (Admin dashboard)
-     * GET /api/business-license/stats
-     */
-    public function stats()
-    {
-        try {
-            $stats = $this->licenseService->getDashboardStats();
-            $businessTypes = $this->licenseService->getBusinessTypeStats();
-            $markets = $this->licenseService->getMarketStats();
-            $expiringSoon = $this->licenseService->getExpiringLicenses(30);
-
-            return $this->respond([
-                'status' => 'success',
-                'data' => [
-                    'overview' => $stats,
-                    'business_types' => $businessTypes,
-                    'markets' => $markets,
-                    'expiring_soon' => count($expiringSoon),
-                    'expiring_licenses' => $expiringSoon
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
-        }
-    }
-
-    /**
-     * Get licenses expiring soon (Admin dashboard widget)
-     * GET /api/business-license/expiring
-     */
-    public function expiring()
-    {
-        $days = $this->request->getGet('days') ?? 30;
-
-        try {
-            $licenses = $this->licenseService->getExpiringLicenses($days);
-
-            return $this->respond([
-                'status' => 'success',
-                'data' => $licenses,
-                'count' => count($licenses)
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
-        }
-    }
-
-    /**
-     * Process license renewal
-     * POST /api/business-license/renew
-     */
-    public function renew()
-    {
-        $previousLicenseNumber = $this->request->getPost('previous_license_number');
-        $formData = $this->request->getPost();
-
-        if (!$previousLicenseNumber) {
-            return $this->failValidationErrors(['previous_license_number' => 'Previous license number is required']);
-        }
-
-        try {
-            $result = $this->licenseService->renewLicense($previousLicenseNumber, $formData);
-
-            return $this->respondCreated([
-                'status' => 'success',
-                'message' => 'Business license renewal application submitted successfully',
-                'reference' => $result['reference_number']
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->fail($e->getMessage(), 400);
+        // 3. Persist down to database layer
+        if ($model->insert($formData)) {
+            return redirect()->to(base_url('business-license'))->with('success', 'Application submitted successfully! Your tracking reference code is: ' . $appCode);
+        } else {
+            return redirect()->back()->withInput()->with('error', 'Database layer transaction failure. Please retry.');
         }
     }
 }

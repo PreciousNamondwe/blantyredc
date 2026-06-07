@@ -52,17 +52,19 @@ class AdminController extends Controller
         $this->noticesModel          = new NoticesModel();
     }
 
-    /**
+   /**
      * 1. ADMIN DASHBOARD METRICS OVERVIEW
      */
     public function dashboard()
     {
+        $dashboardModel = new \App\Models\DashboardModel();
+        $appStats = $dashboardModel->getApplicationStats();
+
         $stats = [
-            'total_applications'        => $this->applicationModel->countAll(),
-            'pending_applications'      => $this->applicationModel->where('status', 'submitted')->countAllResults(),
-            'under_review_applications' => $this->applicationModel->where('status', 'under_review')->countAllResults(),
-            'approved_applications'     => $this->applicationModel->where('status', 'approved')->countAllResults(),
-            'completed_applications'    => $this->applicationModel->where('status', 'completed')->countAllResults(),
+            'total_applications'        => $appStats['total_applications'],
+            'pending_applications'      => $appStats['pending_applications'],
+            'under_review_applications' => $appStats['under_review_applications'],
+            'approved_applications'     => $appStats['approved_applications'],
             'total_users'               => $this->userModel->countAll(),
             'active_users'              => $this->userModel->where('is_active', true)->countAllResults(),
             'total_services'            => $this->serviceModel->countAll(),
@@ -74,91 +76,36 @@ class AdminController extends Controller
         ];
 
         $data = [
-            'page_title' => 'Admin Dashboard Overview',
-            'page'       => 'dashboard', 
-            'stats'      => $stats
+            'page_title'             => 'Admin Dashboard Overview',
+            'page'                   => 'dashboard', 
+            'stats'                  => $stats,
+            'applications_by_status' => $dashboardModel->getApplicationsByStatus(),
+            'recentApplications'     => $dashboardModel->getRecentSubmissions(6)
         ];
 
         return view('admin/layout/admin_master', $data);
     }
-
-    /**
-     * 2. APPLICATION MANAGEMENT WORKFLOWS
-     */
-    public function applications()
-    {
-        $data = [
-            'page_title'   => 'General Applications Queue',
-            'page'         => 'applications', 
-            'applications' => $this->applicationModel->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
+    
+public function applications()
+{
+    $dashboardModel = new \App\Models\DashboardModel();
+    
+    $combinedData = [];
+    try {
+        $combinedData = $dashboardModel->getCombinedApplications();
+    } catch (\Exception $e) {
+        log_message('error', 'Applications Fetch Error: ' . $e->getMessage());
+        return "Database Query Error Detected: " . $e->getMessage();
     }
 
-    public function businessApplications()
-    {
-        $data = [
-            'page_title'   => 'Commercial Business Applications',
-            'page'         => 'business-applications', 
-            'applications' => $this->applicationModel->where('category', 'business')->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
+    $data = [
+        'page_title'   => 'All Service Applications',
+        'page'         => 'applications', // Fixed: Just 'applications' so admin_master compiles view("admin/applications")
+        'applications' => $combinedData
+    ];
 
-    public function applicationDetails($id)
-    {
-        $data = [
-            'page_title'  => 'Application Dossier #' . $id,
-            'page'        => 'application_detail', 
-            'application' => $this->applicationModel->find($id),
-            'logs'        => $this->statusLogModel->where('application_id', $id)->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
-
-    public function updateApplicationStatus($id)
-    {
-        $status = $this->request->getPost('status');
-        $comment = $this->request->getPost('comment');
-
-        $this->applicationModel->update($id, ['status' => $status]);
-        $this->statusLogModel->insert([
-            'application_id' => $id,
-            'status'         => $status,
-            'comment'        => $comment,
-            'changed_by'     => session()->get('user_id') ?? 1
-        ]);
-
-        return redirect()->back()->with('success', 'Application status updated successfully.');
-    }
-
-    /**
-     * 3. USER MANAGEMENT CONTROLS
-     */
-    public function users()
-    {
-        $data = [
-            'page_title' => 'System Identity Profiles',
-            'page'       => 'users', 
-            'users'      => $this->userModel->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
-
-    public function createUser()
-    {
-        if ($this->request->is('post')) {
-            $this->userModel->save($this->request->getPost());
-            return redirect()->to('admin/users')->with('success', 'User access context instantiated successfully.');
-        }
-
-        $data = [
-            'page_title' => 'Register System Account',
-            'page'       => 'users_create' 
-        ];
-        return view('admin/layout/admin_master', $data);
-    }
-
+    return view('admin/layout/admin_master', $data);
+}
    /**
      * MAIN INDEX CATALOG LISTING
      */
@@ -596,11 +543,7 @@ class AdminController extends Controller
         }
         return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Deletion context execution node failure.');
     }
-
-    /**
-     * 7. PRESS RELEASES, COMMUNICATIONS, & BOARD NOTICES
-     */
-    public function news()
+     public function news()
     {
         $data = [
             'page_title' => 'Press Release Ledger',
@@ -610,16 +553,90 @@ class AdminController extends Controller
         return view('admin/layout/admin_master', $data);
     }
 
-    public function notices()
+    /**
+     * Create/Insert a new News Entry
+     */
+    public function createNews()
     {
+        // 1. Gather all fields matching your NewsModel $allowedFields
         $data = [
-            'page_title' => 'Gazette Board Notices & Tenders',
-            'page'       => 'notices', 
-            'notices'    => $this->noticesModel->orderBy('created_at', 'DESC')->findAll()
+            'title'          => $this->request->getPost('title'),
+            'slug'           => $this->request->getPost('slug'),
+            'content'        => $this->request->getPost('content'),
+            'excerpt'        => $this->request->getPost('excerpt'),
+            'featured_image' => $this->request->getPost('featured_image'),
+            'status'         => $this->request->getPost('status'),
+            'published_at'   => $this->request->getPost('published_at') ?: null,
+            'author_id'      => session()->get('user_id') ?? 1, // Fallback safely if auth isn't setup
         ];
-        return view('admin/layout/admin_master', $data);
+
+        // 2. Perform the save operation
+        if ($this->newsModel->insert($data)) {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('success', 'Press release successfully drafted and saved into registry.');
+        } else {
+            return redirect()->back()
+                             ->withInput()
+                             ->with('error', 'Failed to save news entry. Please check validation limits.');
+        }
     }
 
+    /**
+     * Update/Edit an existing News Entry
+     */
+    public function editNews($id)
+    {
+        // 1. Confirm the record actually exists before attempting changes
+        $newsItem = $this->newsModel->find($id);
+        if (!$newsItem) {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('error', 'The targeted news record could not be found.');
+        }
+
+        // 2. Gather modified values from the unified inline form
+        $data = [
+            'title'          => $this->request->getPost('title'),
+            'slug'           => $this->request->getPost('slug'),
+            'content'        => $this->request->getPost('content'),
+            'excerpt'        => $this->request->getPost('excerpt'),
+            'featured_image' => $this->request->getPost('featured_image'),
+            'status'         => $this->request->getPost('status'),
+            'published_at'   => $this->request->getPost('published_at') ?: null,
+        ];
+
+        // 3. Process database update
+        if ($this->newsModel->update($id, $data)) {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('success', 'News publication schema has been successfully recalibrated.');
+        } else {
+            return redirect()->back()
+                             ->withInput()
+                             ->with('error', 'Failed to update changes. Verify your inputs.');
+        }
+    }
+
+
+    /**
+     * Delete a News Entry
+     */
+    public function deleteNews($id)
+    {
+        // 1. Verify existence before deletion
+        if (!$this->newsModel->find($id)) {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('error', 'Target record does not exist or has already been dropped.');
+        }
+
+        // 2. Clear out row from storage
+        if ($this->newsModel->delete($id)) {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('success', 'The news announcement has been permanently purged from the index.');
+        } else {
+            return redirect()->to(base_url('admin/news'))
+                             ->with('error', 'An operational error occurred while trying to delete this item.');
+        }
+    }
+   
     /**
      * 8. FINANCE & REVENUE AUDIT BLOCK
      */
@@ -741,6 +758,211 @@ class AdminController extends Controller
         }
 
         return 'image/officials/' . $newName;
+    }
+
+   /**
+     * 10. PUBLIC NOTICES CRUD WORKFLOW (Rendered as Notifications)
+     * READ: Display all notices in a registry queue
+     */
+    public function notices()
+    {
+        $data = [
+            'page_title' => 'Public Notices & Bulletins Registry',
+            'page'       => 'notifications', // <-- Crucial: This tells admin_master to load admin/notifications.php
+            'notices'    => $this->noticesModel->orderBy('created_at', 'DESC')->findAll()
+        ];
+        return view('admin/layout/admin_master', $data);
+    }
+
+   public function createNotice()
+    {
+        if ($this->request->is('post')) {
+            $formData = [
+                'title'         => $this->request->getPost('title'),
+                'content'       => $this->request->getPost('content'),
+                'reference'     => $this->request->getPost('reference'),
+                'category'      => $this->request->getPost('category'),
+                'urgency_level' => $this->request->getPost('urgency_level'),
+                'status'        => $this->request->getPost('status'),
+                'published_at'  => $this->request->getPost('status') === 'published' ? date('Y-m-d H:i:s') : null,
+                'author_id'     => session()->get('user_id') ?? 1
+            ];
+
+            // The model auto-validates via protected $validationRules matrix
+            if ($this->noticesModel->insert($formData)) {
+                return redirect()->to(base_url('admin/notifications'))
+                                 ->with('success', 'Public board alert bulletin successfully initialized.');
+            } else {
+                return redirect()->back()
+                                 ->withInput()
+                                 ->with('errors', $this->noticesModel->errors());
+            }
+        }
+        return redirect()->to(base_url('admin/notifications'));
+    }
+
+    public function editNotice($id = null)
+    {
+        $notice = $this->noticesModel->find($id);
+        if (!$notice) {
+            return redirect()->to(base_url('admin/notifications'))->with('error', 'Registry entry missing.');
+        }
+
+        if ($this->request->is('post')) {
+            $formData = [
+                'title'         => $this->request->getPost('title'),
+                'content'       => $this->request->getPost('content'),
+                'reference'     => $this->request->getPost('reference'),
+                'category'      => $this->request->getPost('category'),
+                'urgency_level' => $this->request->getPost('urgency_level'),
+                'status'        => $this->request->getPost('status'),
+            ];
+
+            if ($this->request->getPost('status') === 'published' && $notice['status'] !== 'published') {
+                $formData['published_at'] = date('Y-m-d H:i:s');
+            }
+
+            if ($this->noticesModel->update($id, $formData)) {
+                return redirect()->to(base_url('admin/notifications'))->with('success', 'Specifications updated successfully.');
+            } else {
+                return redirect()->back()->withInput()->with('errors', $this->noticesModel->errors());
+            }
+        }
+        return redirect()->to(base_url('admin/notifications'));
+    }
+
+
+    /**
+     * 3. USER MANAGEMENT CONTROLS
+     */
+   /**
+     * 3. USER MANAGEMENT CONTROLS
+     */
+    public function users()
+    {
+        // 1. Pull current user identity context directly from database/session check
+        $currentUserId = session()->get('user_id') ?? 1; // Fallback default to matching admin entry id
+        $currentUser = $this->userModel->find($currentUserId);
+        
+        // 2. Extract accurate role designation directly from the data row array
+        $currentUserRole = $currentUser ? $currentUser['role'] : 'staff';
+
+        // 3. RBAC PERMISSION GATE: Block unrecognized identities from entering this space completely
+        if (!in_array($currentUserRole, ['admin', 'department_head', 'staff', 'reviewer'])) {
+            return redirect()->to('admin/dashboard')->with('errors', ['Access Denied: Insufficient infrastructure clearance.']);
+        }
+
+        // 4. Fetch user list array matrix ordered by registration timestamp sequence
+        $userData = $this->userModel->orderBy('id', 'DESC')->findAll();
+
+        $data = [
+            'page_title'   => 'System Identity Profiles',
+            'page'         => 'users', 
+            'users'        => $userData,
+            'members'      => $userData,
+            'current_role' => $currentUserRole // Passed explicitly so the view layer can read it instantly
+        ];
+        
+        return view('admin/layout/admin_master', $data);
+    }
+
+    public function createUser()
+    {
+        // STRICT RBAC GATE: Only 'admin' can execute provisions
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('admin/users')->with('errors', ['Unauthorized Action: Only Administrators can provision new system nodes.']);
+        }
+
+        if ($this->request->is('post')) {
+            $formData = [
+                'full_name'  => $this->request->getPost('full_name'),
+                'username'   => $this->request->getPost('username'),
+                'email'      => $this->request->getPost('email'),
+                'password'   => $this->request->getPost('password'), // Caught and processed into password_hash by the model's callback
+                'role'       => $this->request->getPost('role'),
+                'department' => $this->request->getPost('department'),
+                'phone'      => $this->request->getPost('phone'),
+                'is_active'  => 1 
+            ];
+
+            if ($this->userModel->insert($formData)) {
+                return redirect()->to('admin/users')->with('success', 'User access context instantiated successfully.');
+            } else {
+                return redirect()->to('admin/users')->withInput()->with('errors', $this->userModel->errors());
+            }
+        }
+
+        $data = [
+            'page_title' => 'Register System Account',
+            'page'       => 'users_create' 
+        ];
+        return view('admin/layout/admin_master', $data);
+    }
+
+    public function editUser($id = null)
+    {
+        // STRICT RBAC GATE: Only 'admin' can overwrite identity vectors
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('admin/users')->with('errors', ['Unauthorized Action: Administrative privileges required to mutate security tokens.']);
+        }
+
+        if (!$user = $this->userModel->find($id)) {
+            return redirect()->to('admin/users')->with('errors', ['Target security profile record signature not found.']);
+        }
+
+        if ($this->request->is('post')) {
+            $formData = [
+                'full_name'  => $this->request->getPost('full_name'),
+                'username'   => $this->request->getPost('username'),
+                'email'      => $this->request->getPost('email'),
+                'role'       => $this->request->getPost('role'),
+                'department' => $this->request->getPost('department'),
+                'phone'      => $this->request->getPost('phone'),
+                'is_active'  => $this->request->getPost('is_active')
+            ];
+
+            $newPassword = $this->request->getPost('password');
+            if (!empty($newPassword)) {
+                $formData['password'] = $newPassword;
+            }
+
+            // Adjust validation rules constraints dynamically to prevent self-uniqueness collisions
+            $this->userModel->setValidationRule('username', "required|min_length[3]|max_length[50]|is_unique[users.username,id,{$id}]");
+            $this->userModel->setValidationRule('email', "required|valid_email|max_length[255]|is_unique[users.email,id,{$id}]");
+            $this->userModel->setValidationRule('password_hash', 'permit_empty');
+
+            if ($this->userModel->update($id, $formData)) {
+                return redirect()->to('admin/users')->with('success', 'Security authentication tokens updated successfully.');
+            } else {
+                return redirect()->to('admin/users')->withInput()->with('errors', $this->userModel->errors());
+            }
+        }
+
+        $data = [
+            'page_title' => 'Configure Security Account Profile',
+            'page'       => 'users_edit',
+            'user'       => $user
+        ];
+        return view('admin/layout/admin_master', $data);
+    }
+
+    public function deleteUser($id = null)
+    {
+        // STRICT RBAC GATE: Only 'admin' can evict system items
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('admin/users')->with('errors', ['Unauthorized Action: Administrative privileges required to execute purge protocols.']);
+        }
+
+        // Prevent self-destruction tracking routines
+        if (session()->get('user_id') == $id) {
+            return redirect()->to('admin/users')->with('errors', ['Security rule triggered: Self-deletion parameter blocks execution.']);
+        }
+
+        if ($this->userModel->delete($id)) {
+            return redirect()->to('admin/users')->with('success', 'Target security node unprovisioned from operational records.');
+        }
+
+        return redirect()->to('admin/users')->with('errors', ['Failed verification sequence during profile eviction processing routine.']);
     }
 
     /**

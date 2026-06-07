@@ -19,7 +19,7 @@
                     <i class="fas fa-file-alt fa-lg text-primary"></i>
                 </div>
                 <div>
-                    <div class="text-muted small fw-medium mb-1">Total Applications</div>
+                    <div class="text-muted small fw-medium mb-1">Total Submissions</div>
                     <h3 class="fw-bold mb-0 text-dark"><?= number_format($stats['total_applications'] ?? 0) ?></h3>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Status</th>
+                                <th>Status Category</th>
                                 <th class="text-end">Count</th>
                             </tr>
                         </thead>
@@ -99,24 +99,11 @@
                                 <?php foreach ($applications_by_status as $row): ?>
                                 <tr>
                                     <td>
-                                        <span class="fw-medium"><?= esc(ucfirst(str_replace('_',' ',$row['status']))) ?></span>
+                                        <span class="fw-medium"><?= esc($row['status']) ?></span>
                                     </td>
                                     <td class="text-end fw-bold text-secondary"><?= number_format($row['count']) ?></td>
                                 </tr>
                                 <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td><span class="fw-medium">Pending Review</span></td>
-                                    <td class="text-end fw-bold text-secondary"><?= number_format($stats['pending_applications'] ?? 0) ?></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="fw-medium">Under Review</span></td>
-                                    <td class="text-end fw-bold text-secondary"><?= number_format($stats['under_review_applications'] ?? 0) ?></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="fw-medium">Approved / Active</span></td>
-                                    <td class="text-end fw-bold text-secondary"><?= number_format($stats['approved_applications'] ?? 0) ?></td>
-                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -128,7 +115,7 @@
     <div class="col-xl-7">
         <div class="card dashboard-card h-100">
             <div class="card-header">
-                <i class="fas fa-history text-muted me-2"></i>Recent Applications
+                <i class="fas fa-history text-muted me-2"></i>Recent Submissions (All Modules)
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -136,7 +123,7 @@
                         <thead>
                             <tr>
                                 <th>Reference</th>
-                                <th>Service</th>
+                                <th>Title / Service Type</th>
                                 <th>Applied Date</th>
                                 <th>Status</th>
                             </tr>
@@ -145,31 +132,29 @@
                             <?php if (!empty($recentApplications) && is_array($recentApplications)): ?>
                                 <?php foreach ($recentApplications as $app): ?>
                                     <?php
-                                        $detailId = $app['id'] ?? $app['application_id'] ?? '';
-                                        $detailUrl = $detailId ? base_url('admin/applications/view/'.$detailId) : '#';
                                         $statusRaw = strtolower($app['status'] ?? '');
                                         $statusLabel = ucfirst(str_replace('_',' ',$statusRaw));
-                                        $statusMap = [
-                                            'pending'   => 'warning text-dark',
-                                            'approved'  => 'success',
-                                            'rejected'  => 'danger',
-                                            'in_review' => 'info text-dark'
-                                        ];
-                                        $badge = $statusMap[$statusRaw] ?? 'secondary';
-                                        $appliedAt = $app['created_at'] ?? $app['applied_at'] ?? $app['date_submitted'] ?? null;
+                                        
+                                        // Badge map definitions
+                                        $badge = 'secondary';
+                                        if (in_array($statusRaw, ['pending', 'pending notice', 'submitted', 'draft'])) {
+                                            $badge = 'warning text-dark';
+                                        } elseif (in_array($statusRaw, ['approved', 'registered'])) {
+                                            $badge = 'success';
+                                        } elseif (in_array($statusRaw, ['rejected', 'objected'])) {
+                                            $badge = 'danger';
+                                        } elseif (in_array($statusRaw, ['under_review', 'inspection_scheduled'])) {
+                                            $badge = 'info text-dark';
+                                        }
                                     ?>
                                     <tr>
                                         <td>
-                                            <?php if ($detailUrl !== '#'): ?>
-                                                <a href="<?= esc($detailUrl) ?>" class="fw-bold"><?= esc($app['application_reference'] ?? '—') ?></a>
-                                            <?php else: ?>
-                                                <span class="text-secondary"><?= esc($app['application_reference'] ?? '—') ?></span>
-                                            <?php endif; ?>
+                                            <span class="fw-bold text-slate-700"><?= esc($app['application_reference'] ?? '—') ?></span>
                                         </td>
                                         <td><span class="text-slate-600"><?= esc($app['service_name'] ?? '—') ?></span></td>
-                                        <td><small class="text-muted"><?= $appliedAt ? esc(date('M j, Y', strtotime($appliedAt))) : '—' ?></small></td>
+                                        <td><small class="text-muted"><?= !empty($app['applied_at']) ? esc(date('M j, Y', strtotime($app['applied_at']))) : '—' ?></small></td>
                                         <td>
-                                            <span class="badge bg-<?= esc($badge) ?>"><?= esc($statusLabel) ?></span>
+                                            <span class="badge bg-<?= $badge ?>"><?= esc($statusLabel) ?></span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -177,7 +162,7 @@
                                 <tr>
                                     <td colspan="4" class="text-center py-4 text-muted">
                                         <i class="fas fa-folder-open d-block mb-2 fa-2x text-muted opacity-50"></i>
-                                        No recent applications found
+                                        No recent records found
                                     </td>
                                 </tr>
                             <?php endif; ?>
