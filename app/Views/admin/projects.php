@@ -1,12 +1,50 @@
+<!-- ==========================================
+     PRO-GRADE CIVIL INFRASTRUCTURE STYLING MATRIX
+     ========================================== -->
 <style>
-    .filter-toolbar {
-        background: #fff;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    :root {
+        /* Government & Institutional Brand Guide */
+        --gov-navy-primary: #1a3352;
+        --gov-navy-hover: #112237;
+        --gov-gold: #d4af37;
+        --gov-gold-light: #fdfaf2;
+        --gov-border: #ccd4dc;
+        --gov-bg-muted: #f5f7fa;
+        --gov-text: #2d3748;
+        
+        /* Microsoft Excel Grid System Specific Palette */
+        --excel-border: #d0d7de;
+        --excel-header-bg: #f6f8fa;
+        --excel-focus-blue: #0066cc;
     }
+
+    /* Government Institutional Header Banner */
+    .gov-banner-header {
+        background: linear-gradient(135deg, var(--gov-navy-primary) 0%, #2c4d75 100%);
+        border-bottom: 4px solid var(--gov-gold);
+        border-radius: 6px 6px 0 0;
+        padding: 1.5rem 1.75rem;
+        color: #ffffff;
+    }
+
+    .gov-title-seal {
+        border-left: 4px solid var(--gov-gold);
+        padding-left: 1.25rem;
+    }
+
+    /* Administrative Filter Matrix Toolbar Component */
+    .filter-toolbar-matrix {
+        background: #ffffff;
+        border-left: 1px solid var(--excel-border);
+        border-right: 1px solid var(--excel-border);
+        border-bottom: 1px solid var(--excel-border);
+        padding: 1rem 1.25rem;
+    }
+
     .search-input-group {
         position: relative;
     }
+    
     .search-input-group i {
         position: absolute;
         left: 12px;
@@ -14,433 +52,561 @@
         transform: translateY(-50%);
         color: #94a3b8;
     }
+
     .search-input-group input {
         padding-left: 35px;
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
+        border-radius: 4px;
+        border-color: var(--excel-border);
+        font-size: 0.875rem;
     }
-    .search-input-group input:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    .search-input-group input:focus,
+    .status-select-matrix:focus {
+        border-color: var(--excel-focus-blue);
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     }
-    .status-select {
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
-        color: #475569;
+
+    .status-select-matrix {
+        border-radius: 4px;
+        border-color: var(--excel-border);
+        color: var(--gov-text);
+        font-size: 0.875rem;
     }
-    .status-select:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    /* Excel High-Density Spreadsheet Data Engine Layout */
+    .excel-card-container {
+        border-left: 1px solid var(--excel-border);
+        border-right: 1px solid var(--excel-border);
+        border-bottom: 1px solid var(--excel-border);
+        background-color: #ffffff;
+        border-radius: 0 0 6px 6px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    .project-icon-box { 
-        width: 44px; 
-        height: 44px; 
+
+    .excel-grid-table {
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* High-Density Microsoft Excel Boundary Grid Matching System */
+    .excel-grid-table th {
+        background-color: var(--excel-header-bg) !important;
+        color: #24292f !important;
+        font-weight: 600 !important;
+        font-size: 0.775rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid var(--excel-border) !important;
+        padding: 10px 12px !important;
+        vertical-align: middle;
+    }
+
+    .excel-grid-table td {
+        border: 1px solid var(--excel-border) !important;
+        padding: 8px 12px !important; 
+        font-size: 0.85rem !important;
+        color: var(--gov-text);
+        vertical-align: middle;
+        background-color: #ffffff;
+    }
+
+    .excel-grid-table tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+    /* System Operational Icons Context Box */
+    .project-icon-box-matrix { 
+        width: 32px; 
+        height: 32px; 
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: rgba(56, 189, 248, 0.1);
-        color: #0284c7;
+        background-color: rgba(26, 51, 82, 0.08);
+        color: var(--gov-navy-primary);
         font-weight: 600;
-        border-radius: 0.5rem; 
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        border-radius: 4px; 
+        border: 1px solid rgba(26, 51, 82, 0.15);
+    }
+
+    /* Native Sheet Simulation Inputs inside Modals */
+    .excel-grid-input {
+        border: 1px solid var(--excel-border) !important;
+        background-color: #ffffff !important;
+        border-radius: 4px !important;
+        font-size: 0.875rem !important;
+        padding: 6px 10px !important;
+        width: 100%;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .excel-grid-input:focus {
+        border: 1px solid var(--excel-focus-blue) !important;
+        box-shadow: inset 0 0 0 1px var(--excel-focus-blue);
+        outline: none;
+    }
+
+    /* Buttons Typography Profiles */
+    .gov-btn-primary {
+        background-color: var(--gov-navy-primary);
+        border-color: var(--gov-navy-primary);
+        color: #ffffff;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .gov-btn-primary:hover, .gov-btn-primary:focus {
+        background-color: var(--gov-navy-hover) !important;
+        border-color: var(--gov-navy-hover) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .gov-btn-secondary-outline {
+        border-color: var(--excel-border);
+        color: #475569;
+        font-size: 0.85rem;
     }
     
-    /* Toggle states for unified view/edit layout modal */
-    .modal-view-mode .form-control-plaintext { font-weight: 500; color: #1e293b; }
+    .gov-btn-secondary-outline:hover {
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .font-monospace-gov {
+        font-family: 'SFMono-Regular', Consolas, "Liberation Mono", Menlo, monospace !important;
+    }
+
+    /* Unified View/Edit Operational Switch Framework Styles */
+    .modal-view-mode .form-control-plaintext { font-weight: 500; color: #1e293b; padding: 0.375rem 0.75rem; }
     .modal-view-mode .editable-field { display: none !important; }
     .modal-view-mode .modal-footer-edit { display: none !important; }
 
     .modal-edit-mode .static-text-field { display: none !important; }
     .modal-edit-mode .editable-field { display: block !important; }
     .modal-edit-mode .modal-footer-view { display: none !important; }
-    
-    .auto-dismiss-alert {
-        transition: all 0.4s ease-in-out;
-        opacity: 1;
+
+    /* Alert and notification containers overlays */
+    .gov-toast-alert {
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-left: 4px solid transparent;
     }
+    .gov-toast-alert.alert-success { border-left-color: #2f855a; background-color: #f0fff4; color: #22543d; }
+    .gov-toast-alert.alert-danger { border-left-color: #c53030; background-color: #fff5f5; color: #742a2a; }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-    <div>
-        <h2 class="fw-bold text-slate-800 mb-1">District Development Projects</h2>
-        <p class="text-muted small mb-0">Monitor, evaluate, and adjust local civil initiatives and structural project criteria.</p>
+<!-- ==========================================
+     TOP MASTER SYSTEM ADMINISTRATIVE BANNER
+     ========================================== -->
+<div class="gov-banner-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div class="gov-title-seal">
+        <h4 class="fw-bold tracking-tight mb-1 text-uppercase text-white" style="letter-spacing: 0.5px;">
+            District Development Projects Matrix
+        </h4>
+        <div class="small opacity-75 text-white font-monospace-gov" style="font-size: 0.75rem;">
+            BLANTYRE DISTRICT COUNCIL &bull; REPUBLIC OF MALAWI CENTRAL INTEGRATED REGISTRY SYSTEM
+        </div>
     </div>
     <div>
-        <button type="button" class="btn btn-primary px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#createProjectModal">
-            <i class="fas fa-plus me-2"></i>Add Project Initiative
+        <button type="button" class="btn btn-light px-3 fw-semibold shadow-sm" style="color: var(--gov-navy-primary); font-size: 0.85rem; border: 1px solid var(--gov-gold);" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+            <i class="fas fa-plus-square me-2 text-warning"></i>Initialize Project Track
         </button>
     </div>
 </div>
 
-<div id="alertWrapper">
+<!-- ALERT FEEDBACK ENGINE CONTROLLER -->
+<div id="alertWrapper" class="px-1 mt-3">
     <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success border-0 shadow-sm mb-4 alert-dismissible fade show auto-dismiss-alert" role="alert">
+        <div class="alert alert-success border-0 gov-toast-alert p-3 mb-3 alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i><?= session()->getFlashdata('success') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-danger border-0 shadow-sm mb-4 alert-dismissible fade show auto-dismiss-alert" role="alert">
+        <div class="alert alert-danger border-0 gov-toast-alert p-3 mb-3 alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i><?= esc(session()->getFlashdata('error')) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 </div>
 
-<div class="filter-toolbar p-3 mb-4">
+<!-- ADMINISTRATIVE FILTER TOOLBAR MATRIX -->
+<div class="filter-toolbar-matrix">
     <div class="row g-3 align-items-center">
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-5">
             <div class="search-input-group">
                 <i class="fas fa-search"></i>
-                <input type="text" id="tableSearch" class="form-control" placeholder="Search by title, location, category, contractor...">
+                <input type="text" id="tableSearch" class="form-control" placeholder="Search system node arrays by title, location, coordinator, asset catalog indices...">
             </div>
         </div>
         <div class="col-md-4 col-lg-3">
-            <select id="statusFilter" class="form-select status-select">
-                <option value="all">All Lifecycles</option>
-                <option value="planning">Planning Phase</option>
-                <option value="ongoing">Ongoing Execution</option>
-                <option value="completed">Completed Projects</option>
+            <select id="statusFilter" class="form-select status-select-matrix">
+                <option value="all">📁 All Directory Lifecycle Phases</option>
+                <option value="planning">📋 Planning Stage Spec</option>
+                <option value="ongoing">⚙️ Active Execution Node</option>
+                <option value="completed">✅ Certified Complete Registry</option>
             </select>
         </div>
-        <div class="col text-md-end text-muted small" id="filterCount"></div>
+        <div class="col text-md-end text-muted font-monospace-gov small" id="filterCount" style="font-size: 0.8rem;"></div>
     </div>
 </div>
 
-<div class="card dashboard-card mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="projectsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 80px; padding-left: 1.5rem;">Icon</th>
-                        <th>Project Title</th>
-                        <th>Category</th>
-                        <th>Location</th>
-                        <th>Budget Allocated</th>
-                        <th>Progress</th>
-                        <th>Status</th>
-                        <th class="text-end" style="padding-right: 1.5rem;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($projects)): ?>
-                        <tr id="noDataRow">
-                            <td colspan="8" class="text-center text-muted py-5">
-                                <i class="fas fa-map-marked-alt d-block mb-2 fa-2x text-black-50 opacity-25"></i>
-                                No civil development initiatives registered in this system yet.
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($projects as $project): ?>
-                            <tr class="project-row" 
-                                id="project-row-<?= $project['id'] ?>"
-                                data-search="<?= strtolower(esc($project['title'] . ' ' . $project['location'] . ' ' . $project['category'] . ' ' . ($project['contractor'] ?? ''))) ?>"
-                                data-lifecycle="<?= esc($project['status']) ?>"
-                                data-id="<?= $project['id'] ?>"
-                                data-title="<?= esc($project['title']) ?>"
-                                data-location="<?= esc($project['location']) ?>"
-                                data-category="<?= esc($project['category']) ?>"
-                                data-status="<?= esc($project['status']) ?>"
-                                data-progress="<?= esc($project['progress_percentage']) ?>"
-                                data-start="<?= esc($project['start_date']) ?>"
-                                data-completion="<?= esc($project['estimated_completion_date']) ?>"
-                                data-budget="<?= esc($project['budget']) ?>"
-                                data-spent="<?= esc($project['spent_amount'] ?? '0.00') ?>"
-                                data-contractor="<?= esc($project['contractor'] ?? '') ?>"
-                                data-fund="<?= esc($project['fund_source'] ?? '') ?>"
-                                data-active="<?= esc($project['is_active']) ?>"
-                                data-desc="<?= esc($project['description']) ?>">
-                                <td style="padding-left: 1.5rem;">
-                                    <div class="project-icon-box">
-                                        <i class="fas fa-city small"></i>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="fw-semibold text-dark d-block"><?= esc($project['title']) ?></span>
-                                    <span class="text-muted mini small">System Node Reference #<?= esc($project['id']) ?></span>
-                                </td>
-                                <td><span class="badge bg-light text-dark border"><?= esc($project['category']) ?></span></td>
-                                <td><span class="text-slate-700"><i class="fas fa-map-marker-alt me-1 text-muted"></i> <?= esc($project['location']) ?></span></td>
-                                <td><span class="fw-medium text-slate-800">$<?= esc(number_format((float)$project['budget'], 2)) ?></span></td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="progress w-100" style="height: 6px;">
-                                            <div class="progress-bar bg-primary" role="progressbar" style="width: <?= esc($project['progress_percentage']) ?>%;"></div>
-                                        </div>
-                                        <span class="small fw-semibold"><?= esc($project['progress_percentage']) ?>%</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <?php if ($project['status'] === 'planning'): ?>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning text-capitalize">Planning</span>
-                                    <?php elseif ($project['status'] === 'ongoing'): ?>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary text-capitalize">Ongoing</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-success bg-opacity-10 text-success text-capitalize">Completed</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td style="padding-right: 1.5rem;">
-                                    <div class="d-flex gap-2 justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 btn-view-project">
-                                            <i class="fas fa-eye me-1"></i> View & Manage
-                                        </button>
-                                        <form method="POST" action="<?= base_url('admin/projects/' . $project['id'] . '/delete') ?>" onsubmit="return confirm('Delete project chart: <?= esc($project['title'], 'js') ?>? operational histories will clear permanently.');">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-2">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    
-                    <tr id="noResultsRow" style="display: none;">
-                        <td colspan="8" class="text-center text-muted py-5">
-                            <i class="fas fa-search d-block mb-2 fa-2x text-black-50 opacity-25"></i>
-                            No matching projects detected in standard directory indices.
+<!-- ==========================================
+     EXCEL GRID ENGINE WORKSPACE CONTAINER
+     ========================================== -->
+<div class="excel-card-container mb-5">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle excel-grid-table" id="projectsTable">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 60px;">Node</th>
+                    <th>Project Reference Title</th>
+                    <th>Structural Area Category</th>
+                    <th>Geographic Boundary Area</th>
+                    <th>Allocated Capital Envelope</th>
+                    <th style="width: 160px;">Execution Matrix</th>
+                    <th style="width: 120px;">Lifecycle Phase</th>
+                    <th class="text-end" style="width: 140px; padding-right: 1.25rem;">Row Control</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($projects)): ?>
+                    <tr id="noDataRow">
+                        <td colspan="8" class="text-center text-muted py-5 bg-light">
+                            <i class="fas fa-folder-open d-block mb-3 fa-2x opacity-50 text-secondary"></i>
+                            <span class="font-monospace-gov small d-block">ERR_EMPTY_REGISTRY_SET</span>
+                            <span class="small text-secondary">No active structural localized civil initiatives configured inside database logs.</span>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
+                <?php else: ?>
+                    <?php foreach ($projects as $project): ?>
+                        <tr class="project-row" 
+                            id="project-row-<?= $project['id'] ?>"
+                            data-search="<?= strtolower(esc($project['title'] . ' ' . $project['location'] . ' ' . $project['category'] . ' ' . ($project['contractor'] ?? ''))) ?>"
+                            data-lifecycle="<?= esc($project['status']) ?>"
+                            data-id="<?= $project['id'] ?>"
+                            data-title="<?= esc($project['title']) ?>"
+                            data-location="<?= esc($project['location']) ?>"
+                            data-category="<?= esc($project['category']) ?>"
+                            data-status="<?= esc($project['status']) ?>"
+                            data-progress="<?= esc($project['progress_percentage']) ?>"
+                            data-start="<?= esc($project['start_date']) ?>"
+                            data-completion="<?= esc($project['estimated_completion_date']) ?>"
+                            data-budget="<?= esc($project['budget']) ?>"
+                            data-spent="<?= esc($project['spent_amount'] ?? '0.00') ?>"
+                            data-contractor="<?= esc($project['contractor'] ?? '') ?>"
+                            data-fund="<?= esc($project['fund_source'] ?? '') ?>"
+                            data-active="<?= esc($project['is_active']) ?>"
+                            data-desc="<?= esc($project['description']) ?>">
+                            
+                            <td class="text-center">
+                                <div class="project-icon-box-matrix mx-auto">
+                                    <i class="fas fa-landmark small"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-dark d-block" style="font-size: 0.875rem;"><?= esc($project['title']) ?></span>
+                                <span class="text-muted font-monospace-gov d-block" style="font-size: 0.725rem;">ID: #_BLANTYRE_INIT_<?= esc($project['id']) ?></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border px-2 py-1 font-monospace-gov" style="font-size: 0.75rem;"><?= esc($project['category']) ?></span>
+                            </td>
+                            <td>
+                                <span class="text-dark fw-medium"><i class="fas fa-map-marker-alt me-1 text-muted"></i> <?= esc($project['location']) ?></span>
+                            </td>
+                            <td>
+                                <span class="font-monospace-gov fw-bold text-dark">$<?= esc(number_format((float)$project['budget'], 2)) ?></span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress w-100" style="height: 6px; border-radius: 2px; background-color: #e2e8f0;">
+                                        <div class="progress-bar bg-success shadow-sm" role="progressbar" style="width: <?= esc($project['progress_percentage']) ?>%;"></div>
+                                    </div>
+                                    <span class="font-monospace-gov fw-bold text-secondary" style="font-size: 0.75rem;"><?= esc($project['progress_percentage']) ?>%</span>
+                                </div>
+                            </td>
+                            <td>
+                                <?php if ($project['status'] === 'planning'): ?>
+                                    <span class="badge bg-warning text-dark border border-warning border-opacity-20 text-capitalize px-2 py-1 w-100 text-center" style="font-size: 0.725rem; font-weight: 600;">⚠️ Planning</span>
+                                <?php elseif ($project['status'] === 'ongoing'): ?>
+                                    <span class="badge bg-primary text-white border border-primary border-opacity-20 text-capitalize px-2 py-1 w-100 text-center" style="font-size: 0.725rem; font-weight: 600;">⚡ Ongoing</span>
+                                <?php else: ?>
+                                    <span class="badge bg-success text-white border border-success border-opacity-20 text-capitalize px-2 py-1 w-100 text-center" style="font-size: 0.725rem; font-weight: 600;">⚙️ Completed</span>
+                                <?php endif; ?>
+                            </td>
+                            <td style="padding-right: 1.25rem;">
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-light gov-btn-secondary-outline px-2 btn-view-project" style="padding-top: 2px; padding-bottom: 2px;">
+                                        <i class="fas fa-folder-open me-1 text-primary"></i> Review
+                                    </button>
+                                    <form method="POST" action="<?= base_url('admin/projects/' . $project['id'] . '/delete') ?>" onsubmit="return confirm('CRITICAL COMPLIANCE NOTICE:\nAre you sure you want to completely clear file chart: [ <?= esc($project['title'], 'js') ?> ]?\nThis action purges structural historical indexes downstream permanently.');">
+                                        <?= csrf_field() ?>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger px-2" style="padding-top: 2px; padding-bottom: 2px; border-color: rgba(220, 53, 69, 0.25);">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                
+                <tr id="noResultsRow" style="display: none;">
+                    <td colspan="8" class="text-center text-muted py-5 bg-light">
+                        <i class="fas fa-search-minus d-block mb-2 fa-2x opacity-50"></i>
+                        <span class="font-monospace-gov small text-danger d-block">ZERO_DIR_MATCHES_DETECTED</span>
+                        <div class="small">Query yielded zero index references inside current configuration bounds.</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
+<!-- ==========================================
+     MODAL: SYSTEM TARGET PROJECT TRACTION FORM
+     ========================================== -->
 <div class="modal fade" id="createProjectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light border-bottom">
-                <h5 class="modal-title fw-bold text-slate-800">Initialize Project Profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-white border-bottom" style="background-color: var(--gov-navy-primary); border-bottom: 3px solid var(--gov-gold) !important;">
+                <h5 class="modal-title fw-bold text-uppercase tracking-wide" style="font-size: 0.95rem; letter-spacing: 0.5px;">
+                    <i class="fas fa-file-invoice me-2 text-warning"></i>Initialize Strategic Project Registry Profile
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= base_url('admin/projects/create') ?>">
                 <?= csrf_field() ?>
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 bg-light">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Project Title</label>
-                            <input type="text" name="title" class="form-control" required placeholder="e.g., Central Road Expansion Phase II">
+                            <label class="form-label fw-bold small text-dark mb-1">Project Metric Identification Title</label>
+                            <input type="text" name="title" class="excel-grid-input" required placeholder="e.g., Central Road Expansion Phase II">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Infrastructure Category Area</label>
-                            <input type="text" name="category" class="form-control" required placeholder="e.g., Transportation, Utilities">
+                            <label class="form-label fw-bold small text-dark mb-1">Infrastructure Area Framework Matrix</label>
+                            <input type="text" name="category" class="excel-grid-input" required placeholder="e.g., Transportation, Utilities, Civil Structural">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Development Location Area</label>
-                            <input type="text" name="location" class="form-control" required placeholder="e.g., Sector 4 Growth Point">
+                            <label class="form-label fw-bold small text-dark mb-1">Development Boundary Demarcation Location</label>
+                            <input type="text" name="location" class="excel-grid-input" required placeholder="e.g., Sector 4 Growth Point, Blantyre District">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Current Status Field</label>
-                            <select name="status" class="form-select status-select" required>
-                                <option value="planning" selected>Planning</option>
-                                <option value="ongoing">Ongoing</option>
-                                <option value="completed">Completed</option>
+                            <label class="form-label fw-bold small text-dark mb-1">Lifecycle Matrix State</label>
+                            <select name="status" class="form-select status-select-matrix" style="padding: 6px 10px;" required>
+                                <option value="planning" selected>Planning Spec</option>
+                                <option value="ongoing">Active Execution</option>
+                                <option value="completed">Certified Closeout</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Execution Progress (%)</label>
-                            <input type="number" name="progress_percentage" class="form-control" min="0" max="100" value="0" required>
+                            <label class="form-label fw-bold small text-dark mb-1">Execution Index (%)</label>
+                            <input type="number" name="progress_percentage" class="excel-grid-input font-monospace-gov" min="0" max="100" value="0" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Financial Budget ($)</label>
-                            <input type="number" step="0.01" name="budget" class="form-control" placeholder="0.00" required>
+                            <label class="form-label fw-bold small text-dark mb-1">Financial Capital Allocation ($)</label>
+                            <input type="number" step="0.01" name="budget" class="excel-grid-input font-monospace-gov" placeholder="0.00" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Spent Budget Amount ($)</label>
-                            <input type="number" step="0.01" name="spent_amount" class="form-control" placeholder="0.00" value="0.00">
+                            <label class="form-label fw-bold small text-dark mb-1">Expended Capital Balance ($)</label>
+                            <input type="number" step="0.01" name="spent_amount" class="excel-grid-input font-monospace-gov" placeholder="0.00" value="0.00">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Start Tracking Date</label>
-                            <input type="date" name="start_date" class="form-control" required>
+                            <label class="form-label fw-bold small text-dark mb-1">Tracking Registry Inception</label>
+                            <input type="date" name="start_date" class="excel-grid-input font-monospace-gov" required>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted">Est. Completion Target</label>
-                            <input type="date" name="estimated_completion_date" class="form-control" required>
+                            <label class="form-label fw-bold small text-dark mb-1">Target Assessment Closeout</label>
+                            <input type="date" name="estimated_completion_date" class="excel-grid-input font-monospace-gov" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Assigned Engineering Contractor</label>
-                            <input type="text" name="contractor" class="form-control" placeholder="Optional contractor company name">
+                            <label class="form-label fw-bold small text-dark mb-1">Lead Structural Engineering Contractor</label>
+                            <input type="text" name="contractor" class="excel-grid-input" placeholder="Optional enterprise corp context identifier">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Capital Funding Source</label>
-                            <input type="text" name="fund_source" class="form-control" placeholder="e.g., Municipal Bonds, Federal Grant">
+                            <label class="form-label fw-bold small text-dark mb-1">Capitalized Allocation Fund Source</label>
+                            <input type="text" name="fund_source" class="excel-grid-input" placeholder="e.g., Municipal Capital Allocations, Federal Grant">
                         </div>
                         <div class="col-md-12">
-                            <div class="form-check form-switch mt-2">
+                            <div class="form-check form-switch p-3 bg-white rounded border border-light shadow-sm">
                                 <input type="hidden" name="is_active" value="0">
-                                <input class="form-check-input" type="checkbox" name="is_active" value="1" checked id="create_is_active">
-                                <label class="form-check-label fw-medium" for="create_is_active">Render Visible in Directory Catalogs Publicly</label>
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="is_active" value="1" checked id="create_is_active">
+                                <label class="form-check-label fw-bold small text-dark" for="create_is_active" style="cursor:pointer;">Publish profile context fields directly into the Central Corporate Directory</label>
                             </div>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-medium small text-muted">Scope Statement / Execution Overview</label>
-                            <textarea name="description" class="form-control" rows="4" required placeholder="Detail baseline execution parameters, structural bounds, or metric milestones..."></textarea>
+                            <label class="form-label fw-bold small text-dark mb-1">Scope Statement / Execution Overview Technical Parameter Logs</label>
+                            <textarea name="description" class="form-control excel-grid-input" style="border-radius:4px !important;" rows="4" required placeholder="Detail core baseline parameters, architectural structures, material limits or milestone metrics..."></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light border-top">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Launch Project Track</button>
+                <div class="modal-footer bg-white border-top">
+                    <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Cancel Session</button>
+                    <button type="submit" class="btn btn-sm gov-btn-primary px-4 shadow-sm"><i class="fas fa-save me-2"></i>Inject Track Records</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- ==========================================
+     MODAL: UNIFIED COGNITIVE VIEW & EDIT SUITE
+     ========================================== -->
 <div class="modal fade modal-view-mode" id="unifiedProjectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content border-0 shadow-lg">
             <form method="POST" id="unifiedProjectForm" action="">
                 <?= csrf_field() ?>
                 
-                <div class="modal-header bg-light border-bottom d-flex justify-content-between align-items-center">
+                <div class="modal-header text-white border-bottom d-flex justify-content-between align-items-center" style="background-color: var(--gov-navy-primary); border-bottom: 3px solid var(--gov-gold) !important;">
                     <div class="d-flex align-items-center">
-                        <h5 class="modal-title fw-bold text-slate-800 me-3" id="modalTitleText">Project Charter Profile</h5>
+                        <h5 class="modal-title fw-bold text-uppercase tracking-wide me-3" id="modalTitleText" style="font-size: 0.95rem; letter-spacing: 0.5px;">
+                            Project Registry Charter Profile
+                        </h5>
                         <div class="form-check form-switch m-0 pt-1">
-                            <input class="form-check-input btn-check-toggle-edit" type="checkbox" id="enableEditToggle">
-                            <label class="form-check-label small fw-semibold text-primary" for="enableEditToggle" style="cursor: pointer;">
-                                <i class="fas fa-edit me-1"></i>Edit Mode
+                            <input class="form-check-input btn-check-toggle-edit" type="checkbox" id="enableEditToggle" style="cursor: pointer;">
+                            <label class="form-check-label small fw-bold text-warning" for="enableEditToggle" style="cursor: pointer; font-size: 0.8rem;">
+                                <i class="fas fa-edit me-1"></i>Unlock Edit Layer
                             </label>
                         </div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 bg-light">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Project Title</label>
-                            <div class="static-text-field form-control-plaintext fs-5 fw-bold text-dark" id="view_title"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Project Specification Title</label>
+                            <div class="static-text-field form-control-plaintext fs-6 fw-bold text-dark p-0 ps-1" id="view_title"></div>
                             <div class="editable-field">
-                                <input type="text" name="title" id="edit_title" class="form-control" required>
+                                <input type="text" name="title" id="edit_title" class="excel-grid-input" required>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Infrastructure Category</label>
-                            <div class="static-text-field form-control-plaintext font-monospace" id="view_category"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Structural Infrastructure Field Category</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov p-0 ps-1 text-secondary" id="view_category"></div>
                             <div class="editable-field">
-                                <input type="text" name="category" id="edit_category" class="form-control" required>
+                                <input type="text" name="category" id="edit_category" class="excel-grid-input" required>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Development Location</label>
-                            <div class="static-text-field form-control-plaintext" id="view_location"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Geographic Segment Boundary Placement</label>
+                            <div class="static-text-field form-control-plaintext p-0 ps-1 text-dark" id="view_location"></div>
                             <div class="editable-field">
-                                <input type="text" name="location" id="edit_location" class="form-control" required>
+                                <input type="text" name="location" id="edit_location" class="excel-grid-input" required>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Current Lifecycle Phase</label>
-                            <div class="static-text-field form-control-plaintext text-capitalize fw-bold" id="view_status"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Current Lifecycle Node State</label>
+                            <div class="static-text-field form-control-plaintext text-capitalize fw-bold p-0 ps-1 text-primary" id="view_status"></div>
                             <div class="editable-field">
-                                <select name="status" id="edit_status" class="form-select status-select" required>
-                                    <option value="planning">Planning</option>
-                                    <option value="ongoing">Ongoing</option>
-                                    <option value="completed">Completed</option>
+                                <select name="status" id="edit_status" class="form-select status-select-matrix" style="padding:6px 10px;" required>
+                                    <option value="planning">Planning Spec</option>
+                                    <option value="ongoing">Active Execution</option>
+                                    <option value="completed">Certified Closeout</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Execution Progress</label>
-                            <div class="static-text-field form-control-plaintext" id="view_progress_percentage"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Progress Index</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov fw-bold p-0 ps-1" id="view_progress_percentage"></div>
                             <div class="editable-field">
                                 <div class="input-group">
-                                    <input type="number" name="progress_percentage" id="edit_progress_percentage" class="form-control" min="0" max="100" required>
-                                    <span class="input-group-text">%</span>
+                                    <input type="number" name="progress_percentage" id="edit_progress_percentage" class="excel-grid-input font-monospace-gov" min="0" max="100" required>
+                                    <span class="input-group-text bg-secondary text-white font-monospace-gov border-0 px-2" style="font-size:0.8rem;">%</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Financial Budget</label>
-                            <div class="static-text-field form-control-plaintext fw-bold text-success" id="view_budget"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Authorized Capital Allocation</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov fw-bold text-success p-0 ps-1" id="view_budget"></div>
                             <div class="editable-field">
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" step="0.01" name="budget" id="edit_budget" class="form-control" required>
+                                    <span class="input-group-text bg-success text-white border-0 px-2 font-monospace-gov" style="font-size:0.8rem;">$</span>
+                                    <input type="number" step="0.01" name="budget" id="edit_budget" class="excel-grid-input font-monospace-gov" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Capital Amount Expended</label>
-                            <div class="static-text-field form-control-plaintext fw-bold text-danger" id="view_spent_amount"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Total Funds Expended</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov fw-bold text-danger p-0 ps-1" id="view_spent_amount"></div>
                             <div class="editable-field">
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" step="0.01" name="spent_amount" id="edit_spent_amount" class="form-control">
+                                    <span class="input-group-text bg-danger text-white border-0 px-2 font-monospace-gov" style="font-size:0.8rem;">$</span>
+                                    <input type="number" step="0.01" name="spent_amount" id="edit_spent_amount" class="excel-grid-input font-monospace-gov">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Tracking Start Date</label>
-                            <div class="static-text-field form-control-plaintext" id="view_start_date"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Tracking Registry Entry</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov p-0 ps-1 text-dark" id="view_start_date"></div>
                             <div class="editable-field">
-                                <input type="date" name="start_date" id="edit_start_date" class="form-control" required>
+                                <input type="date" name="start_date" id="edit_start_date" class="excel-grid-input font-monospace-gov" required>
                             </div>
                         </div>
 
                         <div class="col-md-3">
-                            <label class="form-label fw-medium small text-muted mb-1">Target End Date</label>
-                            <div class="static-text-field form-control-plaintext" id="view_estimated_completion_date"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Target Phase Closeout</label>
+                            <div class="static-text-field form-control-plaintext font-monospace-gov p-0 ps-1 text-dark" id="view_estimated_completion_date"></div>
                             <div class="editable-field">
-                                <input type="date" name="estimated_completion_date" id="edit_estimated_completion_date" class="form-control" required>
+                                <input type="date" name="estimated_completion_date" id="edit_estimated_completion_date" class="excel-grid-input font-monospace-gov" required>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Assigned Engineering Contractor</label>
-                            <div class="static-text-field form-control-plaintext" id="view_contractor"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Contracted Corporate Entity</label>
+                            <div class="static-text-field form-control-plaintext p-0 ps-1 text-dark" id="view_contractor"></div>
                             <div class="editable-field">
-                                <input type="text" name="contractor" id="edit_contractor" class="form-control">
+                                <input type="text" name="contractor" id="edit_contractor" class="excel-grid-input">
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Capital Funding Source</label>
-                            <div class="static-text-field form-control-plaintext" id="view_fund_source"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Capital Ledger Funding Stream</label>
+                            <div class="static-text-field form-control-plaintext p-0 ps-1 text-dark" id="view_fund_source"></div>
                             <div class="editable-field">
-                                <input type="text" name="fund_source" id="edit_fund_source" class="form-control">
+                                <input type="text" name="fund_source" id="edit_fund_source" class="excel-grid-input">
                             </div>
                         </div>
 
                         <div class="col-md-6 d-flex align-items-center pt-2">
                             <div>
-                                <label class="form-label fw-medium small text-muted d-block mb-1">Catalog Registry Visibility</label>
+                                <label class="form-label fw-bold small text-muted d-block mb-1">Public Registry Clearance Status</label>
                                 <div class="static-text-field" id="view_is_active_badge"></div>
                                 <div class="editable-field form-check form-switch m-0">
                                     <input type="hidden" name="is_active" value="0">
-                                    <input class="form-check-input" type="checkbox" name="is_active" id="edit_is_active" value="1">
-                                    <label class="form-check-label fw-semibold text-slate-700" for="edit_is_active">Publish and list on directories publicly</label>
+                                    <input class="form-check-input ms-0 me-2" type="checkbox" name="is_active" id="edit_is_active" value="1">
+                                    <label class="form-check-label fw-bold text-dark small" for="edit_is_active" style="cursor:pointer;">Renders records clear and open to public portal catalogs</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-12 mt-2">
-                            <label class="form-label fw-medium small text-muted mb-1">Scope Statement / Execution Overview</label>
-                            <div class="static-text-field p-3 bg-light rounded border small text-secondary" style="white-space: pre-wrap;" id="view_description"></div>
+                            <label class="form-label fw-bold small text-muted mb-1">Technical Scope Framework Parameters Statement</label>
+                            <div class="static-text-field p-3 bg-white rounded border small text-secondary font-monospace-gov" style="white-space: pre-wrap; font-size:0.8rem; line-height:1.4;" id="view_description"></div>
                             <div class="editable-field">
-                                <textarea name="description" id="edit_description" class="form-control" rows="4" required></textarea>
+                                <textarea name="description" id="edit_description" class="form-control excel-grid-input" rows="4" style="border-radius:4px !important;" required></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light border-top modal-footer-view">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close Profile</button>
+                <div class="modal-footer bg-white border-top modal-footer-view">
+                    <button type="button" class="btn btn-sm btn-secondary px-4" data-bs-dismiss="modal">Close Profile Data</button>
                 </div>
 
-                <div class="modal-footer bg-light border-top modal-footer-edit">
-                    <button type="button" class="btn btn-outline-secondary" id="btnCancelEdit">Cancel Edit</button>
-                    <button type="submit" class="btn btn-success px-4 shadow-sm"><i class="fas fa-save me-2"></i>Recalibrate Specs</button>
+                <div class="modal-footer bg-white border-top modal-footer-edit">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCancelEdit">Discard Alterations</button>
+                    <button type="submit" class="btn btn-sm btn-success px-4 shadow-sm"><i class="fas fa-database me-2"></i>Commit Recalibrated Grid Specs</button>
                 </div>
             </form>
         </div>
