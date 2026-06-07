@@ -1,9 +1,29 @@
 <style>
-    .filter-toolbar {
-        background: #fff;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    :root {
+        /* Blantyre District Council Registry Tokens */
+        --gov-navy-primary: #1a3352;
+        --gov-navy-hover: #112237;
+        --gov-gold: #d4af37;
+        --gov-gold-light: #fdfaf2;
+        --gov-border: #ccd4dc;
+        --gov-bg-muted: #f5f7fa;
+        --gov-text: #2d3748;
+        
+        /* Excel Grid System Specific Palette */
+        --excel-border: #d0d7de;
+        --excel-header-bg: #f6f8fa;
     }
+
+    /* Primary Container Cleanups */
+    .filter-toolbar {
+        background: var(--gov-navy-hover) !important;
+        border: 1px solid var(--excel-border) !important;
+        border-radius: 4px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+        color:var(--excel-header-bg);
+    }
+
+    /* Modern Styled Search Bars */
     .search-input-group {
         position: relative;
     }
@@ -15,33 +35,91 @@
         color: #94a3b8;
     }
     .search-input-group input {
-        padding-left: 35px;
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
+        padding-left: 35px !important;
+        border-radius: 3px !important;
+        border: 1px solid var(--excel-border) !important;
+        font-size: 0.85rem !important;
     }
     .search-input-group input:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        border-color: #0066cc !important;
+        box-shadow: inset 0 0 0 1px #0066cc !important;
+        outline: none !important;
     }
+
+    /* Core Selection Engine Elements */
     .status-select {
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
-        color: #475569;
+        border-radius: 3px !important;
+        border: 1px solid var(--excel-border) !important;
+        color: var(--gov-text) !important;
+        font-size: 0.85rem !important;
     }
     .status-select:focus {
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        border-color: #0066cc !important;
+        box-shadow: inset 0 0 0 1px #0066cc !important;
+        outline: none !important;
     }
+
+    /* Clean Image Thumbnails */
     .table-avatar { 
         width: 44px; 
         height: 44px; 
         object-fit: cover; 
-        border-radius: 0.5rem; 
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        border-radius: 4px !important; 
+        border: 1px solid var(--excel-border) !important;
+    }
+
+    /* Premium Structure Tables */
+    .dashboard-card {
+        border: 1px solid var(--excel-border) !important;
+        background-color: #ffffff !important;
+        border-radius: 4px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
+    }
+    .table {
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+    }
+    .table thead th {
+        background-color: var(--excel-header-bg) !important;
+        color: #24292f !important;
+        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.3px !important;
+        border: 1px solid var(--excel-border) !important;
+        padding: 10px 12px !important;
+    }
+    .table td {
+        border: 1px solid var(--excel-border) !important;
+        padding: 8px 12px !important;
+        font-size: 0.85rem !important;
+        color: var(--gov-text) !important;
+        background-color: #ffffff !important;
+    }
+    .table tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+    /* Global Modal Enhancements */
+    .modal-content {
+        border-radius: 6px !important;
+        overflow: hidden !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .modal-header {
+        background: linear-gradient(135deg, var(--gov-navy-primary) 0%, #2c4d75 100%) !important;
+        border-bottom: 3px solid var(--gov-gold) !important;
+        padding: 1rem 1.5rem !important;
+    }
+    .modal-header .modal-title {
+        color: #ffffff !important;
+    }
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(1) brightness(2) !important;
     }
     
     /* Toggle states for unified view/edit layout modal */
-    .modal-view-mode .form-control-plaintext { font-weight: 500; color: #1e293b; }
+    .modal-view-mode .form-control-plaintext { font-weight: 600; color: #1e293b; }
     .modal-view-mode .editable-field { display: none !important; }
     .modal-view-mode .modal-footer-edit { display: none !important; }
 
@@ -49,20 +127,31 @@
     .modal-edit-mode .editable-field { display: block !important; }
     .modal-edit-mode .modal-footer-view { display: none !important; }
     
+    /* System Flash Alerts Overrides */
+    .alert-success { 
+        border-left: 4px solid #2f855a !important; 
+        background-color: #f0fff4 !important; 
+        color: #22543d !important; 
+    }
+    .alert-danger { 
+        border-left: 4px solid #c53030 !important; 
+        background-color: #fff5f5 !important; 
+        color: #742a2a !important; 
+    }
     .auto-dismiss-alert {
         transition: all 0.4s ease-in-out;
         opacity: 1;
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-    <div>
-        <h2 class="fw-bold text-slate-800 mb-1">Press Releases & Notices</h2>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-3 border-bottom gap-3" style="background-color: var(--gov-navy-primary) !important; border-color: var(--gov-navy-primary) !important; padding: 1.5rem !important; border-radius: 4px !important;">
+    <div style="border-left: 4px solid var(--gov-gold); padding-left: 1rem;">
+        <h2 class="fw-bold mb-1" style="color: var(--excel-header-bg) !important; tracking-tight">Press Releases & Notices</h2>
         <p class="text-muted small mb-0">Manage community updates, media publications, and official public announcements.</p>
     </div>
     <div>
-        <button type="button" class="btn btn-primary px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#createNewsModal">
-            <i class="fas fa-plus me-2"></i>Draft Press Release
+        <button type="button" class="btn px-4 py-2 fw-bold text-white shadow-sm d-flex align-items-center" style="background-color: var(--gov-navy-hover); border-color: var(--gov-navy-hover); border-radius: 4px !important;" data-bs-toggle="modal" data-bs-target="#createNewsModal">
+            <i class="fas fa-plus me-2" style="color: var(--gov-gold);"></i>Draft Press Release
         </button>
     </div>
 </div>
@@ -98,7 +187,7 @@
                 <option value="archived">Archived Notices</option>
             </select>
         </div>
-        <div class="col text-md-end text-muted small" id="filterCount"></div>
+        <div class="col text-md-end text-muted small fw-semibold" id="filterCount"></div>
     </div>
 </div>
 
@@ -113,7 +202,7 @@
                         <th>Short Teaser Excerpt</th>
                         <th>Release Schedule Date</th>
                         <th>Workflow Status</th>
-                        <th class="text-end" style="padding-right: 1.5rem;">Actions</th>
+                        <th class="text-end" style="padding-right: 1.5rem; width: 180px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -142,7 +231,7 @@
                                     <img src="<?= base_url($item['featured_image'] ?: 'image/cropped-BDC-site-logo.png') ?>" alt="News Media" class="table-avatar">
                                 </td>
                                 <td>
-                                    <span class="fw-semibold text-dark d-block"><?= esc($item['title']) ?></span>
+                                    <span class="fw-bold text-dark d-block" style="font-size: 0.9rem;"><?= esc($item['title']) ?></span>
                                     <span class="text-muted small font-monospace">/<?= esc($item['slug']) ?></span>
                                 </td>
                                 <td>
@@ -151,29 +240,29 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-slate-700 small">
-                                        <i class="far fa-calendar-alt me-1 text-muted"></i> 
+                                    <span class="text-dark small fw-medium">
+                                        <i class="far fa-calendar-alt me-1.5 opacity-75"></i> 
                                         <?= $item['published_at'] ? date('M d, Y', strtotime($item['published_at'])) : 'Unscheduled' ?>
                                     </span>
                                 </td>
                                 <td>
                                     <?php if ($item['status'] === 'draft'): ?>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning text-capitalize">Draft</span>
+                                        <span class="badge rounded-pill px-2.5 py-1.5 fw-bold bg-warning text-warning bg-opacity-10 border border-warning border-opacity-25 text-capitalize">Draft</span>
                                     <?php elseif ($item['status'] === 'published'): ?>
-                                        <span class="badge bg-success bg-opacity-10 text-success text-capitalize">Published</span>
+                                        <span class="badge rounded-pill px-2.5 py-1.5 fw-bold bg-success text-success bg-opacity-10 border border-success border-opacity-25 text-capitalize">Published</span>
                                     <?php else: ?>
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary text-capitalize">Archived</span>
+                                        <span class="badge rounded-pill px-2.5 py-1.5 fw-bold bg-secondary text-secondary bg-opacity-10 border border-secondary border-opacity-25 text-capitalize">Archived</span>
                                     <?php endif; ?>
                                 </td>
                                 <td style="padding-right: 1.5rem;">
                                     <div class="d-flex gap-2 justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 btn-view-news">
-                                            <i class="fas fa-eye me-1"></i> View & Manage
+                                        <button type="button" class="btn btn-sm btn-light border text-dark px-2.5 py-1.5 shadow-xs fw-semibold btn-view-news" style="font-size: 0.8rem;">
+                                            <i class="fas fa-eye text-secondary me-1"></i> View & Manage
                                         </button>
-                                        <form method="POST" action="<?= base_url('admin/news/' . $item['id'] . '/delete') ?>" onsubmit="return confirm('Permanently drop news entry: <?= esc($item['title'], 'js') ?>?');">
+                                        <form method="POST" action="<?= base_url('admin/news/' . $item['id'] . '/delete') ?>" onsubmit="return confirm('Permanently drop news entry: <?= esc($item['title'], 'js') ?>?');" class="m-0">
                                             <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-2">
-                                                <i class="fas fa-trash"></i>
+                                            <button type="submit" class="btn btn-sm btn-light border text-danger px-2.5 py-1.5 shadow-xs">
+                                                <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
                                     </div>
@@ -197,24 +286,24 @@
 <div class="modal fade" id="createNewsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light border-bottom">
-                <h5 class="modal-title fw-bold text-slate-800">Draft News Publication</h5>
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-white"><i class="fas fa-file-invoice text-info me-2"></i>Draft News Publication</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= base_url('admin/news/create') ?>">
                 <?= csrf_field() ?>
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 bg-light-subtle">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">Article Headline Title</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Article Headline Title</label>
                             <input type="text" name="title" id="create_title" class="form-control" required placeholder="e.g., Annual Regional Development Summit 2026">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted">URL Slug Identifier</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">URL Slug Identifier</label>
                             <input type="text" name="slug" id="create_slug" class="form-control" required placeholder="annual-regional-development-summit-2026">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted">Workflow Lifecycle Status</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Workflow Lifecycle Status</label>
                             <select name="status" class="form-select status-select" required>
                                 <option value="draft" selected>Draft</option>
                                 <option value="published">Published</option>
@@ -222,26 +311,26 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted">Publish Release Date Time</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Publish Release Date Time</label>
                             <input type="datetime-local" name="published_at" class="form-control">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted">Featured Image URL Asset</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Featured Image URL Asset</label>
                             <input type="text" name="featured_image" class="form-control" placeholder="image/news/summit.jpg">
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-medium small text-muted">Short Excerpt / Ledger Summary Teaser</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Short Excerpt / Ledger Summary Teaser</label>
                             <input type="text" name="excerpt" class="form-control" placeholder="A brief hook sentence displayed on post indexes...">
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-medium small text-muted">Full Communication Copy / Body Markdown Content</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Full Communication Copy / Body Markdown Content</label>
                             <textarea name="content" class="form-control" rows="8" required placeholder="Type the complete comprehensive public news article details here..."></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light border-top">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Save News Asset</button>
+                <div class="modal-footer bg-light border-top py-3 px-4">
+                    <button type="button" class="btn btn-light border px-4 fw-bold text-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn text-white px-4 fw-bold shadow-sm" style="background-color: var(--gov-navy-primary); border-color: var(--gov-navy-primary);">Save News Asset</button>
                 </div>
             </form>
         </div>
@@ -254,12 +343,12 @@
             <form method="POST" id="unifiedNewsForm" action="">
                 <?= csrf_field() ?>
                 
-                <div class="modal-header bg-light border-bottom d-flex justify-content-between align-items-center">
+                <div class="modal-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <h5 class="modal-title fw-bold text-slate-800 me-3" id="modalTitleText">News Publication Entry</h5>
+                        <h5 class="modal-title fw-bold text-white me-4" id="modalTitleText">News Publication Entry</h5>
                         <div class="form-check form-switch m-0 pt-1">
-                            <input class="form-check-input btn-check-toggle-edit" type="checkbox" id="enableEditToggle">
-                            <label class="form-check-label small fw-semibold text-primary" for="enableEditToggle" style="cursor: pointer;">
+                            <input class="form-check-input btn-check-toggle-edit cursor-pointer" type="checkbox" id="enableEditToggle" style="background-color: var(--gov-gold); border-color: var(--gov-gold);">
+                            <label class="form-check-label small fw-bold text-white cursor-pointer opacity-90" for="enableEditToggle">
                                 <i class="fas fa-edit me-1"></i>Edit Mode
                             </label>
                         </div>
@@ -267,10 +356,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 bg-light-subtle">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">Article Headline Title</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Article Headline Title</label>
                             <div class="static-text-field form-control-plaintext fs-5 fw-bold text-dark" id="view_title"></div>
                             <div class="editable-field">
                                 <input type="text" name="title" id="edit_title" class="form-control" required>
@@ -278,15 +367,15 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-medium small text-muted mb-1">URL Slug Reference</label>
-                            <div class="static-text-field form-control-plaintext text-muted font-monospace" id="view_slug"></div>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">URL Slug Reference</label>
+                            <div class="static-text-field form-control-plaintext text-muted font-monospace fw-semibold" id="view_slug"></div>
                             <div class="editable-field">
                                 <input type="text" name="slug" id="edit_slug" class="form-control" required>
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted mb-1">Lifecycle Status</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Lifecycle Status</label>
                             <div class="static-text-field form-control-plaintext text-capitalize fw-bold" id="view_status"></div>
                             <div class="editable-field">
                                 <select name="status" id="edit_status" class="form-select status-select" required>
@@ -298,23 +387,23 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted mb-1">Publication Timestamp</label>
-                            <div class="static-text-field form-control-plaintext" id="view_published_at"></div>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Publication Timestamp</label>
+                            <div class="static-text-field form-control-plaintext text-dark fw-medium" id="view_published_at"></div>
                             <div class="editable-field">
                                 <input type="datetime-local" name="published_at" id="edit_published_at" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-medium small text-muted mb-1">Featured Asset Path</label>
-                            <div class="static-text-field form-control-plaintext text-truncate" id="view_featured_image"></div>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Featured Asset Path</label>
+                            <div class="static-text-field form-control-plaintext text-truncate text-muted small" id="view_featured_image"></div>
                             <div class="editable-field">
                                 <input type="text" name="featured_image" id="edit_featured_image" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-medium small text-muted mb-1">Short Excerpt Summary Teaser</label>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Short Excerpt Summary Teaser</label>
                             <div class="static-text-field form-control-plaintext text-secondary italic" style="font-style: italic;" id="view_excerpt"></div>
                             <div class="editable-field">
                                 <input type="text" name="excerpt" id="edit_excerpt" class="form-control">
@@ -322,8 +411,8 @@
                         </div>
 
                         <div class="col-12 mt-2">
-                            <label class="form-label fw-medium small text-muted mb-1">Full Article Copy Body</label>
-                            <div class="static-text-field p-3 bg-light rounded border small text-dark" style="white-space: pre-wrap; min-height: 120px;" id="view_content"></div>
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Full Article Copy Body</label>
+                            <div class="static-text-field p-3 bg-white rounded border small text-dark" style="white-space: pre-wrap; min-height: 120px; border-color: var(--excel-border) !important;" id="view_content"></div>
                             <div class="editable-field">
                                 <textarea name="content" id="edit_content" class="form-control" rows="8" required></textarea>
                             </div>
@@ -331,13 +420,13 @@
                     </div>
                 </div>
 
-                <div class="modal-footer bg-light border-top modal-footer-view">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close Ledger View</button>
+                <div class="modal-footer bg-light border-top modal-footer-view py-3 px-4">
+                    <button type="button" class="btn btn-light border px-4 fw-bold text-secondary" data-bs-dismiss="modal">Close Ledger View</button>
                 </div>
 
-                <div class="modal-footer bg-light border-top modal-footer-edit">
-                    <button type="button" class="btn btn-outline-secondary" id="btnCancelEdit">Cancel Changes</button>
-                    <button type="submit" class="btn btn-success px-4 shadow-sm"><i class="fas fa-save me-2"></i>Update Entry Spec</button>
+                <div class="modal-footer bg-light border-top modal-footer-edit py-3 px-4">
+                    <button type="button" class="btn btn-light border px-4 fw-bold text-secondary" id="btnCancelEdit">Cancel Changes</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm"><i class="fas fa-save me-2"></i>Update Entry Spec</button>
                 </div>
             </form>
         </div>
