@@ -17,6 +17,9 @@ use App\Models\NoticesModel;
 use App\Models\BusinessTypeModel;
 use App\Libraries\SimplePdf;
 use App\Models\ApplicationDataModel;
+use App\Models\BusinessApplicationModel;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class AdminController extends Controller
 {
@@ -100,11 +103,61 @@ public function applications()
 
     $data = [
         'page_title'   => 'All Service Applications',
-        'page'         => 'applications', // Fixed: Just 'applications' so admin_master compiles view("admin/applications")
+        'page'         => 'applications',
         'applications' => $combinedData
     ];
 
     return view('admin/layout/admin_master', $data);
+}
+public function updateMarriageInline()
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized Access Request'])->setStatusCode(403);
+    }
+
+    $json = $this->request->getJSON();
+    $db = \Config\Database::connect();
+
+    $updateFields = [
+        'certificate_number'    => trim($json->certificate_number),
+        'groom_national_id'     => trim($json->groom_national_id),
+        'groom_first_name'      => trim($json->groom_first_name),
+        'groom_last_name'       => trim($json->groom_last_name),
+        'status'                => $json->status,
+        'registration_fee_paid' => (float)$json->registration_fee_paid,
+        'updated_at'            => date('Y-m-d H:i:s')
+    ];
+
+    $success = $db->table('marriage_certificates')->where('certificate_id', $json->certificate_id)->update($updateFields);
+
+    return $this->response->setJSON($success 
+        ? ['status' => 'success', 'message' => 'Marriage Profile Registry fields updated successfully!'] 
+        : ['status' => 'error', 'message' => 'Database write failure encountered updating entity details.']);
+}
+
+public function updateBusinessInline()
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized Access Request'])->setStatusCode(403);
+    }
+
+    $json = $this->request->getJSON();
+    $db = \Config\Database::connect();
+
+    $updateFields = [
+        'application_code'          => trim($json->application_code),
+        'owner_national_id'         => trim($json->owner_national_id),
+        'business_name'             => trim($json->business_name),
+        'current_stage'             => $json->current_stage,
+        'estimated_annual_turnover' => (float)$json->estimated_annual_turnover,
+        'updated_at'                => date('Y-m-d H:i:s')
+    ];
+
+    $success = $db->table('businesses_application')->where('id', $json->id)->update($updateFields);
+
+    return $this->response->setJSON($success 
+        ? ['status' => 'success', 'message' => 'Business Profile Registry fields updated successfully!'] 
+        : ['status' => 'error', 'message' => 'Database write failure encountered updating license details.']);
 }
    /**
      * MAIN INDEX CATALOG LISTING
@@ -118,6 +171,8 @@ public function applications()
         ];
         return view('admin/layout/admin_master', $data);
     }
+
+    
 
     /**
      * ACCEPTS NEW SUBMISSIONS FROM ENTRY MODAL

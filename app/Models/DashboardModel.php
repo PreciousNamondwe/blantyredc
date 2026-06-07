@@ -113,55 +113,129 @@ class DashboardModel extends Model
         return $db->query($unionQuery)->getResultArray();
     }
     
-public function getCombinedApplications()
-{
-    $db = \Config\Database::connect();
+/**
+     * Get all applications with complete raw database data preserved for print pipelines
+     */
+    public function getCombinedApplications()
+    {
+        $db = \Config\Database::connect();
 
-    // 1. Query Business Applications with unified column names matching the view
-    $businesses = $db->table('businesses_application')
-        ->select('
-            CONCAT("business_", id) as composite_id,
-            application_code as reference_number,
-            owner_name as applicant_name,
-            "Business License" as service_type,
-            owner_phone as phone_number,
-            current_stage as status,
-            created_at
-        ')->get()->getResultArray();
+        // 1. Business Submissions Dataset (All individual columns mapped)
+        $businesses = $db->table('businesses_application')
+            ->select('
+                CONCAT("business_", id) as composite_id,
+                id as raw_id,
+                application_code as reference_number,
+                owner_name as applicant_name,
+                "Business License" as service_type,
+                owner_phone as phone_number,
+                current_stage as status,
+                created_at,
+                application_type,
+                submission_date,
+                business_name,
+                business_type,
+                business_category,
+                owner_national_id,
+                owner_id_image,
+                traditional_authority,
+                village_or_area,
+                physical_address,
+                trading_name,
+                owner_email,
+                plot_number,
+                is_formal_sector,
+                mbrs_registration_number,
+                mra_tpin,
+                estimated_annual_turnover,
+                assigned_reviewer_id,
+                reviewer_remarks
+            ')->get()->getResultArray();
 
-    // 2. Query Marriage Certificates (concatenating names since they use multiple fields)
-    $marriages = $db->table('marriage_certificates')
-        ->select('
-            CONCAT("marriage_", certificate_id) as composite_id,
-            certificate_number as reference_number,
-            CONCAT(groom_first_name, " ", groom_last_name, " & ", bride_first_name, " ", bride_last_name) as applicant_name,
-            "Marriage Certificate" as service_type,
-            "N/A" as phone_number,
-            status as status,
-            created_at
-        ')->get()->getResultArray();
+        // 2. Marriage Profiles Dataset (All individual columns mapped)
+        $rawMarriages = $db->table('marriage_certificates')->get()->getResultArray();
+        $marriages = [];
 
-    // 3. Query Complaint Reports
-    $complaints = $db->table('complaint_reports')
-        ->select('
-            CONCAT("complaint_", id) as composite_id,
-            CONCAT("COMP-", id) as reference_number,
-            applicant_name as applicant_name,
-            CONCAT("Complaint: ", complaint_category) as service_type,
-            applicant_phone as phone_number,
-            "Submitted" as status,
-            created_at
-        ')->get()->getResultArray();
+        foreach ($rawMarriages as $m) {
+            $groomFull = trim(($m['groom_first_name'] ?? '') . ' ' . ($m['groom_last_name'] ?? ''));
+            $brideFull = trim(($m['bride_first_name'] ?? '') . ' ' . ($m['bride_last_name'] ?? ''));
 
-    // Merge all array outputs into a single flat list
-    $allApplications = array_merge($businesses, $marriages, $complaints);
+            $marriages[] = [
+                'composite_id'      => 'marriage_' . $m['certificate_id'],
+                'raw_id'            => $m['certificate_id'],
+                'reference_number'  => $m['certificate_number'] ?? 'N/A',
+                'applicant_name'    => $groomFull . ' & ' . $brideFull,
+                'service_type'      => 'Marriage Certificate',
+                'phone_number'      => 'N/A',
+                'status'            => $m['status'] ?? 'Pending Notice',
+                'created_at'        => $m['created_at'],
+                
+                // Full specific dataset for printing
+                'marriage_type'              => $m['marriage_type'] ?? '',
+                'groom_first_name'           => $m['groom_first_name'] ?? '',
+                'groom_last_name'            => $m['groom_last_name'] ?? '',
+                'groom_national_id'          => $m['groom_national_id'] ?? '',
+                'groom_foreign_passport'     => $m['groom_foreign_passport'] ?? '',
+                'groom_date_of_birth'        => $m['groom_date_of_birth'] ?? '',
+                'groom_origin_id'            => $m['groom_origin_id'] ?? '',
+                'groom_current_residence'    => $m['groom_current_residence'] ?? '',
+                'groom_id_upload_front'      => $m['groom_id_upload_front'] ?? '',
+                'groom_id_upload_back'       => $m['groom_id_upload_back'] ?? '',
+                'groom_passport_bio_upload'  => $m['groom_passport_bio_upload'] ?? '',
+                'bride_first_name'           => $m['bride_first_name'] ?? '',
+                'bride_last_name'            => $m['bride_last_name'] ?? '',
+                'bride_national_id'          => $m['bride_national_id'] ?? '',
+                'bride_foreign_passport'     => $m['bride_foreign_passport'] ?? '',
+                'bride_date_of_birth'        => $m['bride_date_of_birth'] ?? '',
+                'bride_origin_id'            => $m['bride_origin_id'] ?? '',
+                'bride_current_residence'    => $m['bride_current_residence'] ?? '',
+                'bride_id_upload_front'      => $m['bride_id_upload_front'] ?? '',
+                'bride_id_upload_back'       => $m['bride_id_upload_back'] ?? '',
+                'bride_passport_bio_upload'  => $m['bride_passport_bio_upload'] ?? '',
+                'notice_date_form_b'         => $m['notice_date_form_b'] ?? '',
+                'permit_date_form_d'         => $m['permit_date_form_d'] ?? '',
+                'date_of_marriage'           => $m['date_of_marriage'] ?? '',
+                'place_of_marriage'          => $m['place_of_marriage'] ?? '',
+                'officiating_officer'        => $m['officiating_officer'] ?? '',
+                'form_b_notice_document_upload'=> $m['form_b_notice_document_upload'] ?? '',
+                'letter_of_no_impediment_upload'=> $m['letter_of_no_impediment_upload'] ?? '',
+                'groom_witness_id'           => $m['groom_witness_id'] ?? '',
+                'bride_witness_id'           => $m['bride_witness_id'] ?? '',
+                'registration_fee_paid'      => $m['registration_fee_paid'] ?? '0.00',
+                'acknowledgement_slip_issued'=> $m['acknowledgement_slip_issued'] ?? 0
+            ];
+        }
 
-    // Sort the combined array chronologically by 'created_at' in descending order (newest first)
-    usort($allApplications, function ($a, $b) {
-        return strtotime($b['created_at'] ?? '') - strtotime($a['created_at'] ?? '');
-    });
+        // 3. Complaint Reports Dataset (All individual columns mapped)
+        $complaints = $db->table('complaint_reports')
+            ->select('
+                CONCAT("complaint_", id) as composite_id,
+                id as raw_id,
+                CONCAT("COMP-", id) as reference_number,
+                applicant_name as applicant_name,
+                CONCAT("Complaint: ", complaint_category) as service_type,
+                applicant_phone as phone_number,
+                "Submitted" as status,
+                created_at,
+                application_id,
+                complaint_category,
+                complaint_subject,
+                complaint_description,
+                complaint_location,
+                priority_level,
+                anonymous,
+                applicant_email
+            ')->get()->getResultArray();
 
-    return $allApplications;
-}
+        // Combine everything together
+        $allApplications = array_merge($businesses, $marriages, $complaints);
+
+        // Sort chronologically by date created (newest first)
+        usort($allApplications, function ($a, $b) {
+            return strtotime($b['created_at'] ?? '') - strtotime($a['created_at'] ?? '');
+        });
+
+        return $allApplications;
+    }
     
 }

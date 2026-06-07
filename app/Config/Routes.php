@@ -203,8 +203,9 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     
     // --- FIXED: COMBINED APPLICATIONS WORKSPACE ACTION ENGINES ---
     $routes->get('applications', 'AdminController::applications');
-    $routes->get('applications/download/(:any)', 'AdminController::downloadApplicationPdf/$1');
-    $routes->get('applications/delete/(:any)', 'AdminController::deleteApplicationAction/$1');
+    $routes->post('applications/update-marriage', 'AdminController::updateMarriageInline');
+    $routes->post('applications/update-business', 'AdminController::updateBusinessInline');
+    $routes->get('applications/download/(:any)', 'AdminController::download/$1');
     // --------------------------------------------------------------
 
     $routes->get('officials', 'AdminController::officials');
