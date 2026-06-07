@@ -637,34 +637,49 @@ public function editService($id = null)
     }
 
     /**
-     * Delete Management Profile Member via Modal Context Form
-     */
-    public function deleteManagement($id)
-    {
-        if (!$this->request->is('post')) {
-            return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Invalid request method');
-        }
-
-        $member = $this->managementMemberModel->find($id);
-        if ($member) {
-            if (!empty($member['photo']) && file_exists(FCPATH . $member['photo'])) {
-                @unlink(FCPATH . $member['photo']);
-            }
-            $this->managementMemberModel->delete($id);
-            return redirect()->to(base_url('admin/officials?tab=management'))->with('success', 'Management record completely removed.');
-        }
-        return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Deletion context execution node failure.');
-    }
-     public function news()
-    {
-        $data = [
-            'page_title' => 'Press Release Ledger',
-            'page'       => 'news', 
-            'news'       => $this->newsModel->orderBy('created_at', 'DESC')->findAll()
-        ];
-        return view('admin/layout/admin_master', $data);
+ * Delete Management Profile Member via Modal Context Form
+ */
+public function deleteManagement($id = null)
+{
+    // 1. Fallback checkpoint if parameter is missing
+    if ($id === null) {
+        return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Missing management profile identifier.');
     }
 
+    // 2. Enforce structural validation constraint on POST submissions
+    $method = strtolower($this->request->getMethod());
+    if ($method !== 'post') {
+        return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Invalid request method context submission.');
+    }
+
+    try {
+        // 3. FIXED: Safe fallback initialization targeting your exact Model class name
+        // (Verify if your model name is ManagementMemberModel or ManagementModel)
+        $managementModel = $this->managementMemberModel ?? new \App\Models\ManagementMemberModel();
+
+        // 4. Locate target row verification registry context
+        $member = $managementModel->find($id);
+        
+        if (!$member) {
+            return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'Target management profile record missing.');
+        }
+
+        // 5. Safely clean up file assets from disk path structure if present
+        if (!empty($member['photo']) && file_exists(FCPATH . $member['photo'])) {
+            @unlink(FCPATH . $member['photo']);
+        }
+
+        // 6. Execute direct database entry deletion routing
+        $managementModel->delete($id);
+
+        return redirect()->to(base_url('admin/officials?tab=management'))->with('success', 'Management record completely removed.');
+
+    } catch (\Exception $e) {
+        // Catch and isolate silent database or filesystem exceptions cleanly
+        log_message('error', 'Failed to execute management profile deletion: ' . $e->getMessage());
+        return redirect()->to(base_url('admin/officials?tab=management'))->with('error', 'System database engine rejected deletion execution workflows.');
+    }
+}
     /**
      * Create/Insert a new News Entry
      */

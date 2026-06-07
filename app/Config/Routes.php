@@ -221,9 +221,9 @@ $routes->group('admin', ['filter' => 'webadmin'], function($routes) {
     
     $routes->get('management', 'AdminController::management');
     $routes->post('management/create', 'AdminController::createManagement');
-    $routes->post('management/update/(:num)', 'AdminController::updateManagement/$1'); // Fixed: Matches your Edit JS modal target
-    $routes->post('management/delete/(:num)', 'AdminController::deleteManagement/$1'); // Fixed: Matches your HTML Delete form target
-
+    $routes->post('management/(:num)/edit', 'AdminController::editManagement/$1');
+    // Place this inside your admin group container matching your management forms layout:
+    $routes->post('management/(:num)/delete', 'AdminController::deleteManagement/$1');;
    
     $routes->get('news', 'AdminController::news');
     $routes->post('news/create', 'AdminController::createNews');
