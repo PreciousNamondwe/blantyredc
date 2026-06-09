@@ -20,7 +20,7 @@
         border: 1px solid var(--excel-border) !important;
         border-radius: 4px !important;
         box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
-        color:var(--excel-header-bg);
+        color: var(--excel-header-bg);
     }
 
     /* Modern Styled Search Bars */
@@ -59,13 +59,36 @@
         outline: none !important;
     }
 
-    /* Clean Image Thumbnails */
+    /* Clean Image Thumbnails & Multi-Gallery Blocks */
     .table-avatar { 
         width: 44px; 
         height: 44px; 
         object-fit: cover; 
         border-radius: 4px !important; 
         border: 1px solid var(--excel-border) !important;
+    }
+    .gallery-preview-container {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 8px;
+        background: #f8fafc;
+        border: 1px dashed var(--gov-border);
+        border-radius: 4px;
+        min-height: 60px;
+        align-items: center;
+    }
+    .gallery-preview-item {
+        position: relative;
+        width: 55px;
+        height: 55px;
+    }
+    .gallery-preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid var(--excel-border);
     }
 
     /* Premium Structure Tables */
@@ -197,7 +220,7 @@
             <table class="table table-hover align-middle mb-0" id="newsTable">
                 <thead>
                     <tr>
-                        <th style="width: 80px; padding-left: 1.5rem;">Cover</th>
+                        <th style="width: 140px; padding-left: 1.5rem;">Media Album</th>
                         <th>Article Details</th>
                         <th>Short Teaser Excerpt</th>
                         <th>Release Schedule Date</th>
@@ -224,11 +247,25 @@
                                 data-slug="<?= esc($item['slug']) ?>"
                                 data-status="<?= esc($item['status']) ?>"
                                 data-published="<?= esc($item['published_at'] ?? '') ?>"
-                                data-image="<?= esc($item['featured_image'] ?? '') ?>"
+                                data-image='<?= esc($item['featured_image'] ?? '[]') ?>'
                                 data-excerpt="<?= esc($item['excerpt'] ?? '') ?>"
                                 data-content="<?= esc($item['content'] ?? '') ?>">
                                 <td style="padding-left: 1.5rem;">
-                                    <img src="<?= base_url($item['featured_image'] ?: 'image/cropped-BDC-site-logo.png') ?>" alt="News Media" class="table-avatar">
+                                    <div class="d-flex gap-1 align-items-center flex-wrap" style="max-width: 120px;">
+                                        <?php 
+                                            $imgJson = json_decode($item['featured_image'] ?? '[]', true);
+                                            $imagesList = is_array($imgJson) && !empty($imgJson) ? $imgJson : [];
+                                            if (empty($imagesList)) {
+                                                $imagesList[] = 'image/cropped-BDC-site-logo.png';
+                                            }
+                                            foreach(array_slice($imagesList, 0, 2) as $index => $imgPath): 
+                                        ?>
+                                            <img src="<?= base_url($imgPath) ?>" alt="News Media" class="table-avatar" style="width: 34px; height: 34px; <?= $index > 0 ? 'opacity: 0.6;' : '' ?>">
+                                        <?php endforeach; ?>
+                                        <?php if(count($imagesList) > 2): ?>
+                                            <span class="badge bg-secondary text-white font-monospace" style="font-size:0.7rem;">+<?= count($imagesList) - 2 ?></span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td>
                                     <span class="fw-bold text-dark d-block" style="font-size: 0.9rem;"><?= esc($item['title']) ?></span>
@@ -290,7 +327,7 @@
                 <h5 class="modal-title fw-bold text-white"><i class="fas fa-file-invoice text-info me-2"></i>Draft News Publication</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="<?= base_url('admin/news/create') ?>">
+            <form method="POST" action="<?= base_url('admin/news/create') ?>" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 <div class="modal-body p-4 bg-light-subtle">
                     <div class="row g-3">
@@ -315,8 +352,11 @@
                             <input type="datetime-local" name="published_at" class="form-control">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Featured Image URL Asset</label>
-                            <input type="text" name="featured_image" class="form-control" placeholder="image/news/summit.jpg">
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Upload Images Collection</label>
+                            <input type="file" name="featured_images[]" id="create_images_input" class="form-control" multiple accept="image/*">
+                        </div>
+                        <div class="col-12">
+                            <div id="create_images_preview" class="gallery-preview-container" style="display:none;"></div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Short Excerpt / Ledger Summary Teaser</label>
@@ -340,7 +380,7 @@
 <div class="modal fade modal-view-mode" id="unifiedNewsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
-            <form method="POST" id="unifiedNewsForm" action="">
+            <form method="POST" id="unifiedNewsForm" action="" enctype="multipart/form-data">
                 <?= csrf_field() ?>
                 
                 <div class="modal-header d-flex justify-content-between align-items-center">
@@ -395,16 +435,22 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Featured Asset Path</label>
-                            <div class="static-text-field form-control-plaintext text-truncate text-muted small" id="view_featured_image"></div>
-                            <div class="editable-field">
-                                <input type="text" name="featured_image" id="edit_featured_image" class="form-control">
+                            <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Media Uploads Collection</label>
+                            <div class="static-text-field">
+                                <div id="view_images_gallery" class="d-flex gap-1 flex-wrap"></div>
                             </div>
+                            <div class="editable-field">
+                                <input type="file" name="featured_images[]" id="edit_images_input" class="form-control" multiple accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="col-12 editable-field">
+                            <div id="edit_images_preview" class="gallery-preview-container" style="display:none;"></div>
                         </div>
 
                         <div class="col-12">
                             <label class="form-label fw-bold small text-secondary text-uppercase mb-1 tracking-wider">Short Excerpt Summary Teaser</label>
-                            <div class="static-text-field form-control-plaintext text-secondary italic" style="font-style: italic;" id="view_excerpt"></div>
+                            <div class="static-text-field form-control-plaintext text-secondary" style="font-style: italic;" id="view_excerpt"></div>
                             <div class="editable-field">
                                 <input type="text" name="excerpt" id="edit_excerpt" class="form-control">
                             </div>
@@ -442,7 +488,7 @@
             const noResultsRow = document.getElementById('noResultsRow');
             const filterCountOutput = document.getElementById('filterCount');
 
-            // Automatically turn text string strings into cleaner URL hyphens
+            // Automatically slugify titles
             const createTitle = document.getElementById('create_title');
             const createSlug = document.getElementById('create_slug');
             if (createTitle && createSlug) {
@@ -455,7 +501,34 @@
                 });
             }
 
-            // --- 1. Notification Alert Box Dismiss Trigger Engine ---
+            // Helper to render live thumbnails of selected file arrays locally
+            function handleImagePreview(inputElement, previewContainerId) {
+                if (!inputElement) return;
+                inputElement.addEventListener('change', function() {
+                    const container = document.getElementById(previewContainerId);
+                    container.innerHTML = '';
+                    if (this.files && this.files.length > 0) {
+                        container.style.display = 'flex';
+                        Array.from(this.files).forEach(file => {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const wrapper = document.createElement('div');
+                                wrapper.className = 'gallery-preview-item';
+                                wrapper.innerHTML = `<img src="${e.target.result}" alt="Preview thumbnail">`;
+                                container.appendChild(wrapper);
+                            }
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        container.style.display = 'none';
+                    }
+                });
+            }
+
+            handleImagePreview(document.getElementById('create_images_input'), 'create_images_preview');
+            handleImagePreview(document.getElementById('edit_images_input'), 'edit_images_preview');
+
+            // Notification Alert Box Dismiss Trigger Engine
             const targetAlerts = document.querySelectorAll('.auto-dismiss-alert');
             targetAlerts.forEach(function(alertInstance) {
                 setTimeout(function() {
@@ -466,7 +539,7 @@
                 }, 3000);
             });
 
-            // --- 2. Live Client Search Filter Router ---
+            // Live Client Search Filter Router
             function filterTable() {
                 if (!searchInput || !statusFilter) return;
                 const queryValue = searchInput.value.toLowerCase().trim();
@@ -499,7 +572,7 @@
             if (searchInput) searchInput.addEventListener('input', filterTable);
             if (statusFilter) statusFilter.addEventListener('change', filterTable);
 
-            // --- 3. Single-Modal View/Edit Engine Routing ---
+            // Single-Modal View/Edit Engine Routing
             const unifiedModalElement = document.getElementById('unifiedNewsModal');
             const unifiedModal = new bootstrap.Modal(unifiedModalElement);
             const editToggleSwitch = document.getElementById('enableEditToggle');
@@ -507,6 +580,11 @@
             const cancelEditBtn = document.getElementById('btnCancelEdit');
 
             function setModalMode(isEditMode) {
+                // Reset local file previews when switching modes
+                document.getElementById('edit_images_preview').innerHTML = '';
+                document.getElementById('edit_images_preview').style.display = 'none';
+                document.getElementById('edit_images_input').value = '';
+
                 if (isEditMode) {
                     unifiedModalElement.classList.remove('modal-view-mode');
                     unifiedModalElement.classList.add('modal-edit-mode');
@@ -532,16 +610,38 @@
                     document.getElementById('view_slug').textContent = `/${row.getAttribute('data-slug')}`;
                     document.getElementById('view_status').textContent = row.getAttribute('data-status');
                     document.getElementById('view_published_at').textContent = row.getAttribute('data-published') || 'Not Scheduled (Draft Status)';
-                    document.getElementById('view_featured_image').textContent = row.getAttribute('data-image') || 'None Selected';
                     document.getElementById('view_excerpt').textContent = row.getAttribute('data-excerpt') || 'No custom quick description provided.';
                     document.getElementById('view_content').textContent = row.getAttribute('data-content');
+
+                    // Parse & populate current multi-image database entry contents
+                    const galleryBox = document.getElementById('view_images_gallery');
+                    galleryBox.innerHTML = '';
+                    
+                    let imageArray = [];
+                    try {
+                        imageArray = JSON.parse(row.getAttribute('data-image') || '[]');
+                    } catch(e) {
+                        imageArray = [];
+                    }
+
+                    if (Array.isArray(imageArray) && imageArray.length > 0) {
+                        imageArray.forEach(path => {
+                            const img = document.createElement('img');
+                            img.src = `<?= base_url() ?>/${path}`;
+                            img.className = 'table-avatar';
+                            img.style.width = '44px';
+                            img.style.height = '44px';
+                            galleryBox.appendChild(img);
+                        });
+                    } else {
+                        galleryBox.innerHTML = `<img src="<?= base_url('image/cropped-BDC-site-logo.png') ?>" class="table-avatar" style="width:44px; height:44px;">`;
+                    }
 
                     // Sync Form Inputs
                     document.getElementById('edit_title').value = row.getAttribute('data-title');
                     document.getElementById('edit_slug').value = row.getAttribute('data-slug');
                     document.getElementById('edit_status').value = row.getAttribute('data-status');
                     document.getElementById('edit_published_at').value = row.getAttribute('data-published');
-                    document.getElementById('edit_featured_image').value = row.getAttribute('data-image');
                     document.getElementById('edit_excerpt').value = row.getAttribute('data-excerpt');
                     document.getElementById('edit_content').value = row.getAttribute('data-content');
 

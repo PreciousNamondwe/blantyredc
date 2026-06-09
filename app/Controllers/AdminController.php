@@ -698,24 +698,43 @@ public function deleteManagement($id = null)
     /**
      * Create/Insert a new News Entry
      */
+   /**
+     * Create/Insert a new News Entry with Multiple Images
+     */
     public function createNews()
     {
-        // 1. Gather all fields matching your NewsModel $allowedFields
+        // 1. Process Uploading Multiple Files
+        $uploadedImages = [];
+        if ($imageFiles = $this->request->getFiles()) {
+            if (isset($imageFiles['featured_images'])) {
+                foreach ($imageFiles['featured_images'] as $img) {
+                    if ($img->isValid() && !$img->hasMoved()) {
+                        $newName = $img->getRandomName();
+                        // Move file directly into your target directory route
+                        $img->move(ROOTPATH . 'public/image/news', $newName);
+                        $uploadedImages[] = 'image/news/' . $newName;
+                    }
+                }
+            }
+        }
+
+        // 2. Gather all fields matching your NewsModel $allowedFields
         $data = [
             'title'          => $this->request->getPost('title'),
             'slug'           => $this->request->getPost('slug'),
             'content'        => $this->request->getPost('content'),
             'excerpt'        => $this->request->getPost('excerpt'),
-            'featured_image' => $this->request->getPost('featured_image'),
+            // Save image arrays as JSON string payload
+            'featured_image' => !empty($uploadedImages) ? json_encode($uploadedImages) : null,
             'status'         => $this->request->getPost('status'),
             'published_at'   => $this->request->getPost('published_at') ?: null,
-            'author_id'      => session()->get('user_id') ?? 1, // Fallback safely if auth isn't setup
+            'author_id'      => session()->get('user_id') ?? 1,
         ];
 
-        // 2. Perform the save operation
+        // 3. Perform the save operation
         if ($this->newsModel->insert($data)) {
             return redirect()->to(base_url('admin/news'))
-                             ->with('success', 'Press release successfully drafted and saved into registry.');
+                             ->with('success', 'Press release successfully drafted with images.');
         } else {
             return redirect()->back()
                              ->withInput()
@@ -724,7 +743,7 @@ public function deleteManagement($id = null)
     }
 
     /**
-     * Update/Edit an existing News Entry
+     * Update/Edit an existing News Entry with Multiple Images support
      */
     public function editNews($id)
     {
@@ -735,28 +754,41 @@ public function deleteManagement($id = null)
                              ->with('error', 'The targeted news record could not be found.');
         }
 
-        // 2. Gather modified values from the unified inline form
+        // Retain existing images collection as base state context
+        $existingImages = json_decode($newsItem['featured_image'] ?? '[]', true) ?: [];
+
+        // 2. Extract and merge newly uploaded multi-images matrix
+        if ($imageFiles = $this->request->getFiles()) {
+            if (isset($imageFiles['featured_images'])) {
+                foreach ($imageFiles['featured_images'] as $img) {
+                    if ($img->isValid() && !$img->hasMoved()) {
+                        $newName = $img->getRandomName();
+                        $img->move(ROOTPATH . 'public/image/news', $newName);
+                        $existingImages[] = 'image/news/' . $newName;
+                    }
+                }
+            }
+        }
+
         $data = [
             'title'          => $this->request->getPost('title'),
             'slug'           => $this->request->getPost('slug'),
             'content'        => $this->request->getPost('content'),
             'excerpt'        => $this->request->getPost('excerpt'),
-            'featured_image' => $this->request->getPost('featured_image'),
+            'featured_image' => !empty($existingImages) ? json_encode($existingImages) : null,
             'status'         => $this->request->getPost('status'),
             'published_at'   => $this->request->getPost('published_at') ?: null,
         ];
 
-        // 3. Process database update
         if ($this->newsModel->update($id, $data)) {
             return redirect()->to(base_url('admin/news'))
-                             ->with('success', 'News publication schema has been successfully recalibrated.');
+                             ->with('success', 'News publication schema has been successfully updated.');
         } else {
             return redirect()->back()
                              ->withInput()
                              ->with('error', 'Failed to update changes. Verify your inputs.');
         }
     }
-
 
     /**
      * Delete a News Entry
